@@ -28,20 +28,14 @@ function fileName(path: string): string {
   return path.split("/").pop() || path;
 }
 
-export function ArtifactViewer({
-  artifacts,
-  initialPath,
-  className,
-}: ArtifactViewerProps) {
+export function ArtifactViewer({ artifacts, initialPath, className }: ArtifactViewerProps) {
   const [openPaths, setOpenPaths] = useState<string[]>(() => {
     if (initialPath && artifacts.some((a) => a.path === initialPath)) {
       return [initialPath];
     }
     return artifacts.length > 0 ? [artifacts[0].path] : [];
   });
-  const [activePath, setActivePath] = useState<string | null>(
-    openPaths[0] ?? null,
-  );
+  const [activePath, setActivePath] = useState<string | null>(openPaths[0] ?? null);
 
   const activeArtifact = artifacts.find((a) => a.path === activePath) ?? null;
 

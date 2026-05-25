@@ -30,12 +30,7 @@ export function ApprovalGateView({
   className,
 }: ApprovalGateViewProps) {
   return (
-    <Card
-      className={cn(
-        "border border-[var(--warning-border)] bg-[var(--warning-bg)]",
-        className,
-      )}
-    >
+    <Card className={cn("border border-[var(--warning-border)] bg-[var(--warning-bg)]", className)}>
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
           <div className="flex flex-col gap-1">
@@ -55,9 +50,7 @@ export function ApprovalGateView({
               <span className="text-lg font-bold text-[var(--foreground)]">
                 {gate.candidateCount}
               </span>
-              <span className="text-[11px] text-[var(--text-secondary)]">
-                Candidates
-              </span>
+              <span className="text-[11px] text-[var(--text-secondary)]">Candidates</span>
             </div>
           )}
           {gate.promoteCount != null && (
@@ -65,9 +58,7 @@ export function ApprovalGateView({
               <span className="text-lg font-bold text-[var(--status-success)]">
                 {gate.promoteCount}
               </span>
-              <span className="text-[11px] text-[var(--text-secondary)]">
-                Promoted
-              </span>
+              <span className="text-[11px] text-[var(--text-secondary)]">Promoted</span>
             </div>
           )}
           {gate.taskSlug && (

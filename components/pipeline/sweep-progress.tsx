@@ -52,9 +52,7 @@ export function SweepProgress({ sweep, mode, className }: SweepProgressProps) {
         <div className="flex items-end gap-6">
           {/* pass@3 hero */}
           <div className="flex flex-col">
-            <span className="text-[11px] font-medium text-[var(--text-secondary)]">
-              pass@3
-            </span>
+            <span className="text-[11px] font-medium text-[var(--text-secondary)]">pass@3</span>
             <span className="text-2xl font-bold tracking-tight text-[var(--foreground)]">
               {sweep.passAt3}
             </span>
@@ -62,9 +60,7 @@ export function SweepProgress({ sweep, mode, className }: SweepProgressProps) {
 
           {/* Average reward */}
           <div className="flex flex-col">
-            <span className="text-[11px] font-medium text-[var(--text-secondary)]">
-              Avg Reward
-            </span>
+            <span className="text-[11px] font-medium text-[var(--text-secondary)]">Avg Reward</span>
             <span className="text-lg font-semibold text-[var(--foreground)]">
               {avgReward.toFixed(2)}
             </span>
@@ -85,9 +81,7 @@ export function SweepProgress({ sweep, mode, className }: SweepProgressProps) {
 
         {/* Trial grid */}
         <div className="flex flex-col gap-1.5">
-          <span className="text-[11px] font-medium text-[var(--text-secondary)]">
-            Trials
-          </span>
+          <span className="text-[11px] font-medium text-[var(--text-secondary)]">Trials</span>
           <div className="flex flex-wrap gap-1">
             {sweep.trials.map((trial) => (
               <div
@@ -119,9 +113,7 @@ export function SweepProgress({ sweep, mode, className }: SweepProgressProps) {
         {/* Cascade steps */}
         {sweep.cascade && sweep.cascade.length > 0 && (
           <div className="flex flex-col gap-1.5">
-            <span className="text-[11px] font-medium text-[var(--text-secondary)]">
-              Cascade
-            </span>
+            <span className="text-[11px] font-medium text-[var(--text-secondary)]">Cascade</span>
             <div className="flex flex-wrap gap-1">
               {sweep.cascade.map((step) => (
                 <Badge

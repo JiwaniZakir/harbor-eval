@@ -4,14 +4,17 @@ import { Search, Plus, Bell, Settings, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { PipelineRail } from "@/components/pipeline/pipeline-rail";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { useProjectStore } from "@/lib/stores/project-store";
+import { useAgentStore } from "@/lib/stores/agent-store";
 
 export function ChromeBar() {
   const project = useProjectStore((s) => s.project);
   const toggleCommandPalette = useUIStore((s) => s.toggleCommandPalette);
   const setSetupWizardOpen = useUIStore((s) => s.setSetupWizardOpen);
   const notificationCount = useUIStore((s) => s.notificationCount);
+  const currentPhase = useAgentStore((s) => s.currentPhase);
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-chrome)] flex items-center justify-between px-4 py-3">
@@ -35,6 +38,15 @@ export function ChromeBar() {
           </div>
         )}
       </div>
+
+      {/* Center group - Pipeline Rail */}
+      {project && (
+        <div className="pointer-events-auto">
+          <div className="glass rounded-full border border-[var(--border-subtle)] px-4 py-1.5 shadow-[var(--shadow-sm)]">
+            <PipelineRail currentPhase={currentPhase} />
+          </div>
+        </div>
+      )}
 
       {/* Right group */}
       <div className="pointer-events-auto flex items-center gap-1.5">

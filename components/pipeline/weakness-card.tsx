@@ -35,9 +35,11 @@ const severityLabel = (score: number) => {
 const statusColors: Record<WeaknessCandidate["status"], string> = {
   candidate: "bg-[var(--foreground-5)] text-[var(--foreground-60)]",
   approved: "bg-[var(--accent-muted)] text-[var(--brand-primary)]",
-  promoted: "bg-[var(--success-bg)] text-[var(--success-text)] border border-[var(--success-border)]",
+  promoted:
+    "bg-[var(--success-bg)] text-[var(--success-text)] border border-[var(--success-border)]",
   rejected: "bg-[var(--error-bg)] text-[var(--error-text)] border border-[var(--error-border)]",
-  redesign: "bg-[var(--warning-bg)] text-[var(--warning-text)] border border-[var(--warning-border)]",
+  redesign:
+    "bg-[var(--warning-bg)] text-[var(--warning-text)] border border-[var(--warning-border)]",
 };
 
 export function WeaknessCardView({
@@ -62,9 +64,7 @@ export function WeaknessCardView({
             {severityLabel(weakness.workflowFitScore)}
           </Badge>
         </div>
-        <CardDescription className="line-clamp-2">
-          {weakness.hypothesis}
-        </CardDescription>
+        <CardDescription className="line-clamp-2">{weakness.hypothesis}</CardDescription>
       </CardHeader>
 
       <CardContent className="flex flex-col gap-3">
@@ -78,17 +78,13 @@ export function WeaknessCardView({
           >
             {weakness.status}
           </span>
-          <span className="text-[11px] text-[var(--text-tertiary)]">
-            {weakness.domain}
-          </span>
+          <span className="text-[11px] text-[var(--text-tertiary)]">{weakness.domain}</span>
         </div>
 
         {/* Fit score meter */}
         <div className="flex flex-col gap-1">
           <div className="flex items-center justify-between">
-            <span className="text-[11px] font-medium text-[var(--text-secondary)]">
-              Fit Score
-            </span>
+            <span className="text-[11px] font-medium text-[var(--text-secondary)]">Fit Score</span>
             <span className="text-[11px] font-semibold text-[var(--foreground)]">
               {Math.round(weakness.workflowFitScore * 100)}%
             </span>
@@ -105,9 +101,7 @@ export function WeaknessCardView({
       </CardContent>
 
       <CardFooter>
-        <span className="text-[10px] text-[var(--text-muted)]">
-          {weakness.verifierStrategy}
-        </span>
+        <span className="text-[10px] text-[var(--text-muted)]">{weakness.verifierStrategy}</span>
       </CardFooter>
     </Card>
   );

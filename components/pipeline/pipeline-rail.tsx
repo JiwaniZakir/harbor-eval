@@ -12,10 +12,7 @@ export interface PipelineRailProps {
 
 type StageStatus = "completed" | "current" | "upcoming";
 
-function stageStatus(
-  stageId: ProductStage,
-  currentStageId: ProductStage,
-): StageStatus {
+function stageStatus(stageId: ProductStage, currentStageId: ProductStage): StageStatus {
   const stageIdx = productStages.findIndex((s) => s.id === stageId);
   const currentIdx = productStages.findIndex((s) => s.id === currentStageId);
   if (stageIdx < currentIdx) return "completed";
@@ -27,10 +24,7 @@ export function PipelineRail({ currentPhase, className }: PipelineRailProps) {
   const currentStage = stageForPhase(currentPhase);
 
   return (
-    <nav
-      className={cn("flex items-center gap-1", className)}
-      aria-label="Pipeline progress"
-    >
+    <nav className={cn("flex items-center gap-1", className)} aria-label="Pipeline progress">
       {productStages.map((stage, idx) => {
         const status = stageStatus(stage.id, currentStage);
         const isLast = idx === productStages.length - 1;
@@ -43,19 +37,13 @@ export function PipelineRail({ currentPhase, className }: PipelineRailProps) {
               <div
                 className={cn(
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold transition-all duration-[var(--duration-normal)]",
-                  status === "completed" &&
-                    "bg-[var(--brand-primary)] text-white",
+                  status === "completed" && "bg-[var(--brand-primary)] text-white",
                   status === "current" &&
                     "bg-[var(--brand-primary)] text-white shadow-[var(--shadow-glow)]",
-                  status === "upcoming" &&
-                    "bg-[var(--foreground-5)] text-[var(--foreground-30)]",
+                  status === "upcoming" && "bg-[var(--foreground-5)] text-[var(--foreground-30)]",
                 )}
               >
-                {status === "completed" ? (
-                  <Check className="h-3 w-3" strokeWidth={3} />
-                ) : (
-                  idx + 1
-                )}
+                {status === "completed" ? <Check className="h-3 w-3" strokeWidth={3} /> : idx + 1}
               </div>
 
               {/* Label + phase */}
