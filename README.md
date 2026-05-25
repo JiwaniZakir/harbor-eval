@@ -12,18 +12,18 @@ Harbor Eval is a canvas-based workspace for designing and running AI model evalu
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js 16 (App Router) |
-| Language | TypeScript (strict mode) |
-| UI | React 19, Radix UI, Tailwind CSS v4 |
-| Canvas | React Flow (@xyflow/react) |
-| State | Zustand |
-| Animation | Motion (Framer Motion) |
-| AI | Vercel AI SDK (OpenAI, Anthropic, Google) |
-| Database | PostgreSQL + Drizzle ORM |
-| Testing | Vitest + Testing Library |
-| CI/CD | GitHub Actions + Vercel |
+| Layer     | Technology                                |
+| --------- | ----------------------------------------- |
+| Framework | Next.js 16 (App Router)                   |
+| Language  | TypeScript (strict mode)                  |
+| UI        | React 19, Radix UI, Tailwind CSS v4       |
+| Canvas    | React Flow (@xyflow/react)                |
+| State     | Zustand                                   |
+| Animation | Motion (Framer Motion)                    |
+| AI        | Vercel AI SDK (OpenAI, Anthropic, Google) |
+| Database  | PostgreSQL + Drizzle ORM                  |
+| Testing   | Vitest + Testing Library                  |
+| CI/CD     | GitHub Actions + Vercel                   |
 
 ## Quick Start
 
@@ -50,17 +50,17 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Production build |
-| `npm run start` | Start production server |
-| `npm run typecheck` | TypeScript type checking |
-| `npm run lint` | ESLint |
-| `npm run format` | Prettier formatting |
-| `npm run check` | All quality checks |
-| `npm run test` | Run unit tests |
-| `npm run test:watch` | Tests in watch mode |
+| Command              | Description              |
+| -------------------- | ------------------------ |
+| `npm run dev`        | Start development server |
+| `npm run build`      | Production build         |
+| `npm run start`      | Start production server  |
+| `npm run typecheck`  | TypeScript type checking |
+| `npm run lint`       | ESLint                   |
+| `npm run format`     | Prettier formatting      |
+| `npm run check`      | All quality checks       |
+| `npm run test`       | Run unit tests           |
+| `npm run test:watch` | Tests in watch mode      |
 
 ## Architecture
 

@@ -1,4 +1,5 @@
 # Harbor Eval Canvas: Comprehensive Build Specification
+
 ## For PM Agent / Implementation Agent
 
 > Synthesized from deep audits of: **Cofounder.co** (primary target), **dub.co** (code patterns), **Linear** (animation/typography), **Resend** (minimalism), **tldraw** (canvas UX)
@@ -8,6 +9,7 @@
 ---
 
 ## Table of Contents
+
 1. [Product Overview](#1-product-overview)
 2. [Architecture Blueprint](#2-architecture-blueprint)
 3. [Design System Specification](#3-design-system-specification)
@@ -25,9 +27,11 @@
 ## 1. Product Overview
 
 ### What Harbor Eval Canvas Is
+
 A visual, canvas-based platform for designing and running AI model evaluation campaigns. Users create evaluation "campaigns" that contain domains (e.g., Reasoning, Safety, Multilingual), each with milestones and probes. An AI agent assists in building and running evaluations.
 
 ### Core Screens
+
 1. **Canvas View** - Radial node graph showing domains around a center model node
 2. **Home Sidebar** - Right panel with greeting, roadmap progress, tasks, suggestions
 3. **Domain Detail** - Expanded view of a single domain with milestones and probes
@@ -37,6 +41,7 @@ A visual, canvas-based platform for designing and running AI model evaluation ca
 7. **Command Palette** - Quick search/action (Cmd+K)
 
 ### Visual Identity
+
 - **Warm, approachable** - Not cold/corporate. Think "research lab notebook" meets "modern SaaS"
 - **Canvas-first** - The graph IS the product, not a feature
 - **Light theme only** - Warm beige background, white cards, purple accent
@@ -48,6 +53,7 @@ A visual, canvas-based platform for designing and running AI model evaluation ca
 ## 2. Architecture Blueprint
 
 ### Tech Stack
+
 ```
 Framework:     Next.js 16+ (App Router, Turbopack)
 Canvas:        React Flow (@xyflow/react)
@@ -60,6 +66,7 @@ Toasts:        Sonner
 ```
 
 ### File Structure
+
 ```
 app/
   layout.tsx          # Root: html, fonts, providers
@@ -83,6 +90,7 @@ lib/
 ```
 
 ### Store Architecture
+
 ```
 project-store    → Campaign metadata (name, model, settings)
 domain-store     → Domain states, milestones, probes, suggestions
@@ -92,6 +100,7 @@ ui-store         → Panel states, active tab, focus, modals
 ```
 
 ### Page Layout (Target Architecture)
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ Floating Chrome Bar (transparent, pointer-events-none)       │
@@ -121,88 +130,96 @@ ui-store         → Panel states, active tab, focus, modals
 ### Color Tokens
 
 #### Surface Hierarchy
+
 ```css
 /* Cofounder exact values (from Playwright extraction) */
---bg:                    #f1f1ee;    /* Canvas/page background */
---bg-warm:               #edede9;    /* Slightly darker warm */
---bg-card:               #ffffff;    /* Card surfaces */
---bg-card-secondary:     #fcfcf9;    /* Secondary cards (Cofounder: --background-l150) */
---bg-sidebar:            #f5f5f2;    /* Sidebar background (Cofounder: aside bg) */
---bg-sidebar-inner:      #fbfbf8;    /* Inner sidebar section (Cofounder: section bg) */
---bg-elevated:           #ecece9;    /* Cofounder: --background-l-negative-50 */
---bg-dropdown:           #fefefb;    /* Dropdown menus */
---bg-raised:             #f8f8f6;    /* Raised surfaces */
---bg-overlay:            rgba(0, 0, 0, 0.5);
---bg-inverted:           #4f4f4f;    /* Dark buttons (Cofounder exact) */
+--bg: #f1f1ee; /* Canvas/page background */
+--bg-warm: #edede9; /* Slightly darker warm */
+--bg-card: #ffffff; /* Card surfaces */
+--bg-card-secondary: #fcfcf9; /* Secondary cards (Cofounder: --background-l150) */
+--bg-sidebar: #f5f5f2; /* Sidebar background (Cofounder: aside bg) */
+--bg-sidebar-inner: #fbfbf8; /* Inner sidebar section (Cofounder: section bg) */
+--bg-elevated: #ecece9; /* Cofounder: --background-l-negative-50 */
+--bg-dropdown: #fefefb; /* Dropdown menus */
+--bg-raised: #f8f8f6; /* Raised surfaces */
+--bg-overlay: rgba(0, 0, 0, 0.5);
+--bg-inverted: #4f4f4f; /* Dark buttons (Cofounder exact) */
 ```
 
 #### Foreground Scale
+
 ```css
 /* Cofounder: #202020 base with opacity steps */
---foreground:            #202020;
---foreground-90:         #202020e6;   /* ~90% */
---foreground-80:         #202020cc;
---foreground-70:         #202020b3;
---foreground-60:         #20202099;
---foreground-50:         #20202080;
---foreground-40:         #20202066;
---foreground-30:         #2020204d;
---foreground-20:         #20202033;
---foreground-15:         #20202026;
---foreground-10:         #2020201a;
---foreground-8:          #20202014;
---foreground-5:          #2020200d;
---foreground-3:          #20202008;
---foreground-inverse:    #ffffff;
+--foreground: #202020;
+--foreground-90: #202020e6; /* ~90% */
+--foreground-80: #202020cc;
+--foreground-70: #202020b3;
+--foreground-60: #20202099;
+--foreground-50: #20202080;
+--foreground-40: #20202066;
+--foreground-30: #2020204d;
+--foreground-20: #20202033;
+--foreground-15: #20202026;
+--foreground-10: #2020201a;
+--foreground-8: #20202014;
+--foreground-5: #2020200d;
+--foreground-3: #20202008;
+--foreground-inverse: #ffffff;
 ```
 
 #### Border Scale
+
 ```css
 /* Cofounder: pure black with opacity */
---border:                #0000001a;   /* 10% - default */
---border-8:              #00000014;   /* 8% - subtle */
---border-5:              #0000000d;   /* 5% - very subtle */
---border-strong:         #0003;       /* 20% - emphasis */
+--border: #0000001a; /* 10% - default */
+--border-8: #00000014; /* 8% - subtle */
+--border-5: #0000000d; /* 5% - very subtle */
+--border-strong: #0003; /* 20% - emphasis */
 ```
 
 #### Accent Colors
+
 ```css
---accent:                #7b5cf0;     /* Brand purple */
---accent-hover:          #6a4de0;
---accent-muted:          rgba(123, 92, 240, 0.12);
---accent-glow:           rgba(123, 92, 240, 0.2);
+--accent: #7b5cf0; /* Brand purple */
+--accent-hover: #6a4de0;
+--accent-muted: rgba(123, 92, 240, 0.12);
+--accent-glow: rgba(123, 92, 240, 0.2);
 ```
 
 #### Domain Accent Colors (8 Domains)
+
 ```css
---domain-instruction:    #4087f2;    /* Blue */
---domain-reasoning:      #8a72e5;    /* Purple */
---domain-safety:         #f46746;    /* Red-orange */
---domain-knowledge:      #80a740;    /* Green */
---domain-calibration:    #b16a27;    /* Amber */
---domain-multilingual:   #3aafa9;    /* Teal */
---domain-longcontext:    #e8596c;    /* Pink */
---domain-tooluse:        #6c63ff;    /* Indigo */
+--domain-instruction: #4087f2; /* Blue */
+--domain-reasoning: #8a72e5; /* Purple */
+--domain-safety: #f46746; /* Red-orange */
+--domain-knowledge: #80a740; /* Green */
+--domain-calibration: #b16a27; /* Amber */
+--domain-multilingual: #3aafa9; /* Teal */
+--domain-longcontext: #e8596c; /* Pink */
+--domain-tooluse: #6c63ff; /* Indigo */
 ```
 
 #### Status Colors
+
 ```css
---status-success:        #16a34a;
---status-warning:        #ca8a04;
---status-error:          #dc2626;
---status-info:           #2563eb;
---status-probing:        var(--accent);
+--status-success: #16a34a;
+--status-warning: #ca8a04;
+--status-error: #dc2626;
+--status-info: #2563eb;
+--status-probing: var(--accent);
 ```
 
 ### Typography
 
 #### Font Stack
+
 ```css
---font-sans:   Figtree, "Figtree Fallback", system-ui, sans-serif;
---font-mono:   "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+--font-sans: Figtree, "Figtree Fallback", system-ui, sans-serif;
+--font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
 ```
 
 #### Type Scale (Cofounder-matched + Linear-inspired)
+
 ```
 Page Title:     24px / 600 / 1.2 / -0.3px tracking
                 (Cofounder: "Good morning, Zakir" heading)
@@ -231,55 +248,47 @@ Mono Code:      13px / 400 / 1.5
 ```
 
 ### Shadows (Cofounder Exact)
+
 ```css
 /* Card shadow - multi-layer for depth */
---shadow-card: 
-  inset 0 0 0 1px #fff,
-  0 0 0 1px rgba(0,0,0,0.08),
-  0 0 20px rgba(0,0,0,0.03),
-  0 23px 28px rgba(0,0,0,0.02);
+--shadow-card:
+  inset 0 0 0 1px #fff, 0 0 0 1px rgba(0, 0, 0, 0.08), 0 0 20px rgba(0, 0, 0, 0.03),
+  0 23px 28px rgba(0, 0, 0, 0.02);
 
 /* Button shadows */
 --shadow-button-sm:
-  inset 0 0.75px 0 0 #fff,
-  inset 0 0 0.36px 1.07px #fff,
-  0 3px 3px rgba(0,0,0,0.02);
+  inset 0 0.75px 0 0 #fff, inset 0 0 0.36px 1.07px #fff, 0 3px 3px rgba(0, 0, 0, 0.02);
 
 --shadow-button-md:
-  inset 0 0.75px 0 0 #fff,
-  inset 0 0 0.36px 1.07px #fff,
-  0 1px 2px rgba(0,0,0,0.08),
-  0 3px 3px rgba(0,0,0,0.03);
+  inset 0 0.75px 0 0 #fff, inset 0 0 0.36px 1.07px #fff, 0 1px 2px rgba(0, 0, 0, 0.08),
+  0 3px 3px rgba(0, 0, 0, 0.03);
 
 /* Department node (from Cofounder computed styles) */
 --shadow-dept-node:
-  rgba(0,0,0,0.05) 0 0 0 1px inset,
-  rgb(255,255,255) 0 1px 0 0 inset,
-  rgba(0,0,0,0.03) 0 0 20px 0,
-  rgba(0,0,0,0.02) 0 65px 45px 0,
-  rgba(0,0,0,0.02) 0 50px 35px 0,
-  rgba(0,0,0,0.01) 0 40px 25px 0,
+  rgba(0, 0, 0, 0.05) 0 0 0 1px inset, rgb(255, 255, 255) 0 1px 0 0 inset,
+  rgba(0, 0, 0, 0.03) 0 0 20px 0, rgba(0, 0, 0, 0.02) 0 65px 45px 0,
+  rgba(0, 0, 0, 0.02) 0 50px 35px 0, rgba(0, 0, 0, 0.01) 0 40px 25px 0,
   inset 0 0 0 1px var(--department-workspace-inset-highlight);
 
 /* Sidebar */
---shadow-sidebar:
-  0 0 0 1px rgba(0,0,0,0.06),
-  0 4px 16px rgba(0,0,0,0.04);
+--shadow-sidebar: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.04);
 ```
 
 ### Border Radius Scale
+
 ```css
---radius-xs:    4px;
---radius-sm:    6px;
---radius-md:    8px;
---radius-lg:    11px;     /* Cofounder: department card inner corners */
---radius-xl:    12px;     /* Sidebar, main panels */
---radius-2xl:   16px;     /* Large cards */
---radius-3xl:   22px;     /* Department workspace outer shell */
---radius-full:  9999px;   /* Pills, badges */
+--radius-xs: 4px;
+--radius-sm: 6px;
+--radius-md: 8px;
+--radius-lg: 11px; /* Cofounder: department card inner corners */
+--radius-xl: 12px; /* Sidebar, main panels */
+--radius-2xl: 16px; /* Large cards */
+--radius-3xl: 22px; /* Department workspace outer shell */
+--radius-full: 9999px; /* Pills, badges */
 ```
 
 ### Spacing Scale
+
 ```
 4px   (1)   - Icon gap, tight padding
 6px   (1.5) - Badge padding, small gap
@@ -300,6 +309,7 @@ Mono Code:      13px / 400 / 1.5
 ### Viewport Structure (Cofounder Match)
 
 #### Top-level
+
 ```
 Full viewport: 100vw x 100vh
 ├── Canvas: absolute inset-0 (full viewport)
@@ -309,7 +319,9 @@ Full viewport: 100vw x 100vh
 ```
 
 #### Chrome Bar (Floating Toolbar)
+
 Source: Cofounder `canvas-toolbar` at (0, 68)
+
 ```
 Position:       fixed top, overlaying canvas
 Height:         ~48px visual, no background fill
@@ -322,7 +334,9 @@ pointer-events: none on container, auto on each button
 ```
 
 #### Right Sidebar
+
 Source: Cofounder computed (2092, 76) - 460x1356px
+
 ```
 Width:          460px (CSS var --companion-width)
 Position:       right side, floating
@@ -351,7 +365,9 @@ Inner structure:
 ```
 
 #### Canvas Area
+
 Source: Cofounder `.react-flow` at (0, 68) - 2560x1372px
+
 ```
 Position:       absolute, fills viewport
 Top offset:     68px (below the minimal topbar zone)
@@ -367,6 +383,7 @@ Controls:       bottom-left (above minimap)
 ## 5. Component Specifications
 
 ### 5.1 Chrome Bar Buttons
+
 ```
 Each button is an independent glass element:
   height:        28px
@@ -383,6 +400,7 @@ Avatar button specifically:
 ```
 
 ### 5.2 Sidebar Tab Bar
+
 ```
 Container: flex items-center gap-2, relative
 Background pill (active indicator):
@@ -399,7 +417,9 @@ Tab button:
 ```
 
 ### 5.3 Roadmap Progress Card
+
 Source: Cofounder sidebar "Harboreval Roadmap 14%"
+
 ```
 Container:
   w-full rounded-[var(--radius-xl)] p-4
@@ -420,7 +440,9 @@ Progress bar:
 ```
 
 ### 5.4 Task List Item
+
 Source: Cofounder sidebar active tasks
+
 ```
 Container:
   flex w-full items-center gap-3
@@ -444,7 +466,9 @@ Right:
 ```
 
 ### 5.5 Domain Node (Canvas Card)
+
 Source: Cofounder department nodes, computed 165x52px at canvas scale
+
 ```
 Cofounder's actual department node is SMALL on canvas:
   Native size at 0.11x scale = ~1500x472px native → 165x52px rendered
@@ -475,6 +499,7 @@ Action button:
 ```
 
 ### 5.6 Center Model Node
+
 ```
 Larger than domain nodes, represents the AI model being evaluated
   Size:          94x55px rendered (Cofounder's cofounderNode)
@@ -484,6 +509,7 @@ Larger than domain nodes, represents the AI model being evaluated
 ```
 
 ### 5.7 Connection Edges
+
 ```
 Source: Cofounder uses custom SVG with animated particles
 
@@ -497,6 +523,7 @@ Our implementation:
 ```
 
 ### 5.8 Button Component (dub.co-inspired CVA)
+
 ```tsx
 Variants:
   primary:    bg-inverted text-white border-black
@@ -518,6 +545,7 @@ Base classes:
 ```
 
 ### 5.9 Badge Component
+
 ```tsx
 Base:  rounded-full border px-2 py-0.5 text-[11px] font-medium whitespace-nowrap
 
@@ -532,7 +560,9 @@ Variants:
 ```
 
 ### 5.10 Command Palette (Cmd+K)
+
 Source: dub.co pattern + Linear style
+
 ```
 Overlay:     fixed inset-0 z-50 bg-black/50 backdrop-blur-sm
 Container:   max-w-[640px] mx-auto mt-[20vh]
@@ -555,6 +585,7 @@ Keyboard:
 ```
 
 ### 5.11 Detail Panel (Domain Expanded)
+
 ```
 Container:
   width: var(--detail-panel-width) = 460px (replaces sidebar)
@@ -578,7 +609,9 @@ Mobile: Vaul drawer (slide up from bottom)
 ```
 
 ### 5.12 Notification Inbox
+
 Source: Cofounder "4 agent updates" popover
+
 ```
 Trigger:
   Button with relative badge count (absolute -top-0.5 -right-0.5)
@@ -593,6 +626,7 @@ Popover:
 ```
 
 ### 5.13 Campaign Setup Wizard
+
 ```
 Modal: centered, max-w-[560px]
   bg-white rounded-2xl shadow-elevated
@@ -614,6 +648,7 @@ Navigation: Back + Continue buttons, keyboard support
 ## 6. Canvas System
 
 ### React Flow Configuration
+
 ```tsx
 {
   nodeTypes: {
@@ -626,17 +661,17 @@ Navigation: Back + Continue buttons, keyboard support
     domainConnection: DomainConnection,
     dependencyEdge: DependencyEdge,
   },
-  
+
   // Canvas settings
   minZoom: 0.1,
   maxZoom: 2,
   defaultViewport: { x: center, y: center, zoom: 0.8 },
   fitView: true,
   fitViewOptions: { padding: 0.2 },
-  
+
   // Background
   <Background variant="dots" gap={20} size={1} color="rgba(32,32,32,0.05)" />
-  
+
   // Controls position
   <CanvasControls position="bottom-left" />
   <CanvasMiniMap position="bottom-left" below controls />
@@ -644,6 +679,7 @@ Navigation: Back + Continue buttons, keyboard support
 ```
 
 ### Radial Layout Algorithm
+
 ```
 Center node: (0, 0)
 Domain nodes: distributed evenly on a circle
@@ -657,6 +693,7 @@ When domain is selected/expanded:
 ```
 
 ### Node Interaction States
+
 ```
 Default:     shadow-card, cursor-pointer
 Hovered:     shadow-card-hover, slight scale(1.01), border-color transition
@@ -674,63 +711,103 @@ Disabled:    opacity-50, cursor-not-allowed
 ```css
 /* Panel appear (dub.co: fade-in-blur) */
 @keyframes fade-in-blur {
-  0%   { opacity: 0; filter: blur(4px); }
-  50%  { opacity: 0.5; filter: blur(0px); }
-  100% { opacity: 1; filter: blur(0px); }
+  0% {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  50% {
+    opacity: 0.5;
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0px);
+  }
 }
 
 /* Node appear (dub.co: scale-in-fade) */
 @keyframes scale-in-fade {
-  0%   { transform: scale(0.95); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Slide transitions (dub.co timing) */
 @keyframes slide-up-fade {
-  0%   { opacity: 0; transform: translateY(2px); }
-  100% { opacity: 1; transform: translateY(0); }
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Panel slide-in */
 @keyframes slide-in-from-right {
-  0%   { transform: translateX(100%); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 /* Edge flow (dots moving along connections) */
 @keyframes edge-flow {
-  0%   { stroke-dashoffset: 24; }
-  100% { stroke-dashoffset: 0; }
+  0% {
+    stroke-dashoffset: 24;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
 }
 
 /* Agent activity pulse */
 @keyframes agent-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(123, 92, 240, 0.4); }
-  50%      { box-shadow: 0 0 0 8px rgba(123, 92, 240, 0); }
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(123, 92, 240, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(123, 92, 240, 0);
+  }
 }
 
 /* Loading spinner (dub.co) */
 @keyframes spinner {
-  0%   { opacity: 1; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 ```
 
 ### Timing Functions
+
 ```css
 /* Standard easing (dub.co) */
---ease-out:          cubic-bezier(0.16, 1, 0.3, 1);      /* popover, tooltip */
---ease-in-out:       cubic-bezier(0.87, 0, 0.13, 1);      /* accordion */
---ease-spring:       cubic-bezier(0.34, 1.56, 0.64, 1);   /* bounce effect */
+--ease-out: cubic-bezier(0.16, 1, 0.3, 1); /* popover, tooltip */
+--ease-in-out: cubic-bezier(0.87, 0, 0.13, 1); /* accordion */
+--ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* bounce effect */
 
 /* Duration scale */
---duration-fast:     150ms;   /* hover states, button press */
---duration-normal:   200ms;   /* panel transitions */
---duration-slow:     400ms;   /* page transitions, slide */
---duration-blur:     500ms;   /* fade-in-blur effect */
+--duration-fast: 150ms; /* hover states, button press */
+--duration-normal: 200ms; /* panel transitions */
+--duration-slow: 400ms; /* page transitions, slide */
+--duration-blur: 500ms; /* fade-in-blur effect */
 ```
 
 ### Interaction Animations
+
 ```
 Button press:       translateY(1px), 50ms
 Button hover:       ring-4 appear, 150ms
@@ -750,6 +827,7 @@ Canvas zoom:        smooth (React Flow default)
 ## 8. Interaction Patterns
 
 ### Keyboard Shortcuts
+
 ```
 Cmd+K         → Command palette
 Cmd+/         → Toggle agent chat
@@ -761,6 +839,7 @@ Space         → Fit view to canvas
 ```
 
 ### Canvas Interactions
+
 ```
 Click node           → Open domain detail in sidebar
 Double-click node    → Zoom to node + expand milestones
@@ -772,6 +851,7 @@ Right-click          → Context menu (copy, share, expand, etc.)
 ```
 
 ### Sidebar Interactions
+
 ```
 Tab click            → Switch sidebar content (with animated indicator)
 Task click           → Open domain detail (replace sidebar content)
@@ -782,6 +862,7 @@ Resize handle        → Drag to resize sidebar width
 ```
 
 ### Panel Transitions
+
 ```
 HomeSidebar → DetailPanel:  slide content left, new slides in from right
 DetailPanel → CompanionPanel: crossfade with slight scale
@@ -793,6 +874,7 @@ Any → CommandPalette: overlay scale-in-fade
 ## 9. Page-by-Page Specifications
 
 ### 9.1 Canvas Home (Default View)
+
 ```
 When:    Project loaded, no domain selected
 Shows:   Canvas with radial nodes + Home sidebar
@@ -802,6 +884,7 @@ Chrome:  Avatar, org name, search, create, notifications, settings
 ```
 
 ### 9.2 Domain Selected
+
 ```
 When:    User clicks a domain node
 Shows:   Canvas (domain highlighted) + Detail sidebar
@@ -811,6 +894,7 @@ Transition: Home sidebar content slides out, detail slides in
 ```
 
 ### 9.3 Agent Chat Active
+
 ```
 When:    User opens companion panel (Cmd+/ or tab)
 Shows:   Canvas + Chat sidebar
@@ -820,6 +904,7 @@ Tool calls: Expandable cards showing agent tool invocations
 ```
 
 ### 9.4 Campaign Setup
+
 ```
 When:    No project exists OR user clicks "New Campaign"
 Shows:   Modal wizard over canvas (or empty state)
@@ -828,6 +913,7 @@ Animation: fade-in-blur between steps
 ```
 
 ### 9.5 Settings
+
 ```
 When:    Settings icon clicked or nav tab
 Shows:   Settings view in detail panel
@@ -837,6 +923,7 @@ Style:   inset-surface cards for each section
 ```
 
 ### 9.6 Empty State
+
 ```
 When:    No project loaded
 Shows:   Full canvas area with centered empty state
@@ -849,6 +936,7 @@ Style:   Subtle, inviting, with fade-in animation
 ## 10. Implementation Roadmap
 
 ### Phase 1: Layout Restructure (Critical Path)
+
 **Goal: Match Cofounder's layout architecture**
 
 ```
@@ -882,6 +970,7 @@ Style:   Subtle, inviting, with fade-in animation
 ```
 
 ### Phase 2: Component Polish
+
 **Goal: Match dub.co component quality**
 
 ```
@@ -913,6 +1002,7 @@ Style:   Subtle, inviting, with fade-in animation
 ```
 
 ### Phase 3: Canvas Polish
+
 **Goal: Match Cofounder's canvas quality**
 
 ```
@@ -944,6 +1034,7 @@ Style:   Subtle, inviting, with fade-in animation
 ```
 
 ### Phase 4: Panel Content Polish
+
 **Goal: Match Cofounder's sidebar content quality**
 
 ```
@@ -975,6 +1066,7 @@ Style:   Subtle, inviting, with fade-in animation
 ```
 
 ### Phase 5: Interaction & Animation
+
 **Goal: Linear/dub-level animation quality**
 
 ```
@@ -1005,6 +1097,7 @@ Style:   Subtle, inviting, with fade-in animation
 ```
 
 ### Phase 6: Responsive & Edge Cases
+
 ```
 26.[ ] Mobile layout
        - Sidebar becomes bottom sheet (Vaul drawer)
@@ -1032,6 +1125,7 @@ Style:   Subtle, inviting, with fade-in animation
 ## 11. Quality Checklist
 
 ### Visual Quality (check against Cofounder screenshots)
+
 - [ ] Background color matches: #f1f1ee
 - [ ] Sidebar bg matches: #f5f5f2 with 12px radius
 - [ ] Sidebar inner section: #fbfbf8 with 10px radius
@@ -1047,6 +1141,7 @@ Style:   Subtle, inviting, with fade-in animation
 - [ ] No glass-border/glass-bg legacy classes remain
 
 ### Interaction Quality (check against Linear/dub)
+
 - [ ] All buttons have hover state change within 150ms
 - [ ] Panels animate in/out (not instant)
 - [ ] Tab switching has animated indicator
@@ -1057,6 +1152,7 @@ Style:   Subtle, inviting, with fade-in animation
 - [ ] Keyboard shortcuts all functional
 
 ### Code Quality
+
 - [ ] Zero TypeScript errors
 - [ ] No console warnings in dev
 - [ ] All components use design tokens (no hardcoded colors)
@@ -1066,6 +1162,7 @@ Style:   Subtle, inviting, with fade-in animation
 - [ ] Tailwind classes use design system variables
 
 ### Performance
+
 - [ ] First paint < 1s
 - [ ] Canvas renders 8 nodes without jank
 - [ ] Sidebar scrolls at 60fps
@@ -1104,7 +1201,7 @@ Sidebar:        304px = 64px icon col + 240px nav area, bg neutral-200
 Content:        bg-white, lg:rounded-xl, scrollable
 Nav buttons:    14px/500 Inter
 H1 (marketing): 48px/500 Satoshi
-H2:             36-48px/500 Satoshi  
+H2:             36-48px/500 Satoshi
 Body:           14px/400 Inter
 Button:         h-10, rounded-lg, border, ring-4 on hover
 Badge:          rounded-full, border, px-2, text-xs/500
@@ -1114,15 +1211,15 @@ Animations:     fade-in-blur 0.5s, scale-in-fade 0.2s, slide-up-fade 0.4s
 
 ## Appendix C: Key File References
 
-| Concept | Cofounder (inspect) | dub.co (source) | Harbor (implement) |
-|---------|--------------------|-----------------|--------------------|
-| Layout grid | `canvas-overlay` + `canvas-side-panel` | `apps/web/ui/layout/main-nav.tsx` | `app/page.tsx` |
-| Sidebar nav | `data-side-panel-tabs` | `apps/web/ui/layout/sidebar/sidebar-nav.tsx` | `components/layout/home-sidebar.tsx` |
-| Color tokens | Playwright CSS vars (448) | `packages/tailwind-config/themes.css` | `app/globals.css` |
-| Button | `canvas-chrome-blur` class | `packages/ui/src/button.tsx` | `components/ui/button.tsx` |
-| Badge | Cofounder status pills | `packages/ui/src/badge.tsx` | `components/ui/badge.tsx` |
-| Modal/Panel | Department workspace expand | `packages/ui/src/modal.tsx` | `components/layout/detail-panel.tsx` |
-| Animations | CSS keyframes in main CSS | `packages/tailwind-config/tailwind.config.ts` | `app/globals.css` |
-| Font config | HTML `<link>` preloads | `apps/web/styles/fonts.ts` | `app/layout.tsx` |
-| Node design | `department-workspace-home-panel` | (no equivalent) | `components/canvas/domain-node.tsx` |
-| Canvas | React Flow with custom nodes | (no equivalent) | `components/canvas/canvas-shell.tsx` |
+| Concept      | Cofounder (inspect)                    | dub.co (source)                               | Harbor (implement)                   |
+| ------------ | -------------------------------------- | --------------------------------------------- | ------------------------------------ |
+| Layout grid  | `canvas-overlay` + `canvas-side-panel` | `apps/web/ui/layout/main-nav.tsx`             | `app/page.tsx`                       |
+| Sidebar nav  | `data-side-panel-tabs`                 | `apps/web/ui/layout/sidebar/sidebar-nav.tsx`  | `components/layout/home-sidebar.tsx` |
+| Color tokens | Playwright CSS vars (448)              | `packages/tailwind-config/themes.css`         | `app/globals.css`                    |
+| Button       | `canvas-chrome-blur` class             | `packages/ui/src/button.tsx`                  | `components/ui/button.tsx`           |
+| Badge        | Cofounder status pills                 | `packages/ui/src/badge.tsx`                   | `components/ui/badge.tsx`            |
+| Modal/Panel  | Department workspace expand            | `packages/ui/src/modal.tsx`                   | `components/layout/detail-panel.tsx` |
+| Animations   | CSS keyframes in main CSS              | `packages/tailwind-config/tailwind.config.ts` | `app/globals.css`                    |
+| Font config  | HTML `<link>` preloads                 | `apps/web/styles/fonts.ts`                    | `app/layout.tsx`                     |
+| Node design  | `department-workspace-home-panel`      | (no equivalent)                               | `components/canvas/domain-node.tsx`  |
+| Canvas       | React Flow with custom nodes           | (no equivalent)                               | `components/canvas/canvas-shell.tsx` |

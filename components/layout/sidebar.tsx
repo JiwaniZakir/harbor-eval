@@ -7,15 +7,7 @@ import { useDomainStore } from "@/lib/stores/domain-store";
 import { DOMAINS } from "@/lib/domain/domains";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import {
-  Home,
-  Bot,
-  Layers,
-  ClipboardList,
-  Library,
-  Sparkles,
-  ArrowRight,
-} from "lucide-react";
+import { Home, Bot, Layers, ClipboardList, Library, Sparkles, ArrowRight } from "lucide-react";
 import type { SidebarTab, DomainId } from "@/lib/types";
 import { AgentChat } from "@/components/companion/agent-chat";
 
@@ -71,12 +63,15 @@ function HomeContent() {
       {/* Greeting */}
       <div>
         <h2 className="text-lg font-semibold text-[var(--foreground)]">
-          Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 18 ? "afternoon" : "evening"}
+          Good{" "}
+          {new Date().getHours() < 12
+            ? "morning"
+            : new Date().getHours() < 18
+              ? "afternoon"
+              : "evening"}
         </h2>
         <p className="text-xs text-[var(--text-muted)]">
-          {project
-            ? `Working on ${project.name}`
-            : "Create a campaign to get started"}
+          {project ? `Working on ${project.name}` : "Create a campaign to get started"}
         </p>
       </div>
 
@@ -84,12 +79,8 @@ function HomeContent() {
       {project && (
         <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-medium text-[var(--foreground)]">
-              {project.name}
-            </span>
-            <span className="text-[11px] text-[var(--text-muted)]">
-              {globalProgress}%
-            </span>
+            <span className="text-xs font-medium text-[var(--foreground)]">{project.name}</span>
+            <span className="text-[11px] text-[var(--text-muted)]">{globalProgress}%</span>
           </div>
           <Progress value={globalProgress} className="h-1" />
         </div>
@@ -102,9 +93,7 @@ function HomeContent() {
             Domains
           </h3>
           <div className="flex flex-col gap-1">
-            {DOMAINS.filter(
-              (d) => domainStates[d.id]?.status !== "locked",
-            ).map((domain) => {
+            {DOMAINS.filter((d) => domainStates[d.id]?.status !== "locked").map((domain) => {
               const state = domainStates[domain.id];
               return (
                 <button
@@ -157,10 +146,7 @@ function HomeContent() {
                 onClick={() => handleDomainClick(probe.domainId)}
                 className="group flex items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-2 text-left transition-colors hover:bg-[var(--foreground-5)]"
               >
-                <Sparkles
-                  size={12}
-                  className="shrink-0 text-[var(--brand-primary)]"
-                />
+                <Sparkles size={12} className="shrink-0 text-[var(--brand-primary)]" />
                 <span className="flex-1 truncate text-xs text-[var(--foreground-60)]">
                   {probe.label}
                 </span>
@@ -210,9 +196,7 @@ function DomainsContent() {
               style={{ backgroundColor: isLocked ? "var(--status-locked)" : domain.accent }}
             />
             <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-[var(--foreground)]">
-                {domain.label}
-              </div>
+              <div className="text-sm font-medium text-[var(--foreground)]">{domain.label}</div>
               <div className="mt-0.5 text-xs text-[var(--text-muted)] line-clamp-2">
                 {domain.description}
               </div>
@@ -245,7 +229,16 @@ function TasksContent() {
   );
 
   const sections = [
-    { key: "probing", label: "Active", items: [...(grouped.probing || []), ...(grouped.building || []), ...(grouped.validating || []), ...(grouped.in_progress || [])] },
+    {
+      key: "probing",
+      label: "Active",
+      items: [
+        ...(grouped.probing || []),
+        ...(grouped.building || []),
+        ...(grouped.validating || []),
+        ...(grouped.in_progress || []),
+      ],
+    },
     { key: "available", label: "Available", items: grouped.available || [] },
     { key: "completed", label: "Completed", items: grouped.completed || [] },
     { key: "locked", label: "Locked", items: grouped.locked || [] },
@@ -280,9 +273,7 @@ function TasksContent() {
                   <span className="flex-1 truncate text-xs text-[var(--foreground-70)]">
                     {m.label}
                   </span>
-                  <span className="text-[10px] text-[var(--text-muted)]">
-                    {domain?.shortLabel}
-                  </span>
+                  <span className="text-[10px] text-[var(--text-muted)]">{domain?.shortLabel}</span>
                 </button>
               );
             })}
@@ -297,9 +288,7 @@ function PlaceholderContent({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
       <div className="text-sm text-[var(--text-muted)]">{label}</div>
-      <div className="mt-1 text-xs text-[var(--foreground-30)]">
-        Coming soon
-      </div>
+      <div className="mt-1 text-xs text-[var(--foreground-30)]">Coming soon</div>
     </div>
   );
 }
@@ -318,9 +307,7 @@ export function Sidebar() {
         {activeTab === "agent" && <AgentChat />}
         {activeTab === "domains" && <DomainsContent />}
         {activeTab === "tasks" && <TasksContent />}
-        {activeTab === "library" && (
-          <PlaceholderContent label="Artifact Library" />
-        )}
+        {activeTab === "library" && <PlaceholderContent label="Artifact Library" />}
       </div>
     </div>
   );

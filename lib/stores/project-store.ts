@@ -48,25 +48,19 @@ export const useProjectStore = create<ProjectStore>()(
 
       updateProject(partial) {
         set((s) => ({
-          project: s.project
-            ? { ...s.project, ...partial, updatedAt: Date.now() }
-            : null,
+          project: s.project ? { ...s.project, ...partial, updatedAt: Date.now() } : null,
         }));
       },
 
       setTargetModel(config) {
         set((s) => ({
-          project: s.project
-            ? { ...s.project, targetModel: config, updatedAt: Date.now() }
-            : null,
+          project: s.project ? { ...s.project, targetModel: config, updatedAt: Date.now() } : null,
         }));
       },
 
       setStatus(status) {
         set((s) => ({
-          project: s.project
-            ? { ...s.project, status, updatedAt: Date.now() }
-            : null,
+          project: s.project ? { ...s.project, status, updatedAt: Date.now() } : null,
         }));
       },
 

@@ -20,15 +20,11 @@ export const metadata: Metadata = {
     default: "Harbor Eval",
     template: "%s | Harbor Eval",
   },
-  description:
-    "Visual AI evaluation platform. Design evals that find where models fail.",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
-  ),
+  description: "Visual AI evaluation platform. Design evals that find where models fail.",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"),
   openGraph: {
     title: "Harbor Eval",
-    description:
-      "Visual AI evaluation platform. Design evals that find where models fail.",
+    description: "Visual AI evaluation platform. Design evals that find where models fail.",
     type: "website",
   },
   icons: {
@@ -42,11 +38,7 @@ export const viewport: Viewport = {
   themeColor: "#f1f1ee",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${figtree.variable} ${jetbrains.variable}`}>
       <body className="min-h-screen bg-[var(--bg)] font-sans text-[var(--foreground)] antialiased">

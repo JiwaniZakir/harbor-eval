@@ -5,13 +5,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { DOMAINS } from "@/lib/domain/domains";
-import {
-  Search,
-  Settings,
-  Plus,
-  Bot,
-  Home,
-} from "lucide-react";
+import { Search, Settings, Plus, Bot, Home } from "lucide-react";
 import type { DomainId } from "@/lib/types";
 
 interface CommandItem {
@@ -39,14 +33,20 @@ export function CommandPalette() {
       id: "home",
       label: "Go to Home",
       icon: <Home size={16} />,
-      action: () => { setSidebarTab("home"); setOpen(false); },
+      action: () => {
+        setSidebarTab("home");
+        setOpen(false);
+      },
       category: "Navigation",
     },
     {
       id: "agent",
       label: "Open Agent Chat",
       icon: <Bot size={16} />,
-      action: () => { setSidebarTab("agent"); setOpen(false); },
+      action: () => {
+        setSidebarTab("agent");
+        setOpen(false);
+      },
       category: "Navigation",
     },
     {
@@ -54,19 +54,17 @@ export function CommandPalette() {
       label: "New Campaign",
       description: "Create a new evaluation campaign",
       icon: <Plus size={16} />,
-      action: () => { setSetupWizardOpen(true); setOpen(false); },
+      action: () => {
+        setSetupWizardOpen(true);
+        setOpen(false);
+      },
       category: "Actions",
     },
     ...DOMAINS.map((domain) => ({
       id: `domain-${domain.id}`,
       label: domain.label,
       description: domain.description,
-      icon: (
-        <div
-          className="h-3 w-3 rounded-full"
-          style={{ backgroundColor: domain.accent }}
-        />
-      ),
+      icon: <div className="h-3 w-3 rounded-full" style={{ backgroundColor: domain.accent }} />,
       action: () => {
         setFocusedDomain(domain.id as DomainId);
         openDetailPanel({ kind: "domain" as const, domainId: domain.id as DomainId });
@@ -168,13 +166,9 @@ export function CommandPalette() {
                             : "hover:bg-[var(--foreground-5)]",
                         )}
                       >
-                        <span className="shrink-0 text-[var(--foreground-40)]">
-                          {item.icon}
-                        </span>
+                        <span className="shrink-0 text-[var(--foreground-40)]">{item.icon}</span>
                         <div className="min-w-0 flex-1">
-                          <div className="text-sm text-[var(--foreground)]">
-                            {item.label}
-                          </div>
+                          <div className="text-sm text-[var(--foreground)]">{item.label}</div>
                           {item.description && (
                             <div className="truncate text-xs text-[var(--text-muted)]">
                               {item.description}

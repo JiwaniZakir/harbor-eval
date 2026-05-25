@@ -3,13 +3,7 @@
 import { memo } from "react";
 import { BaseEdge, getStraightPath, type EdgeProps } from "@xyflow/react";
 
-function DomainEdgeComponent({
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  data,
-}: EdgeProps) {
+function DomainEdgeComponent({ sourceX, sourceY, targetX, targetY, data }: EdgeProps) {
   const [edgePath] = getStraightPath({
     sourceX,
     sourceY,

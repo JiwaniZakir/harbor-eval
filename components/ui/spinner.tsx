@@ -8,9 +8,6 @@ interface SpinnerProps {
 
 export function Spinner({ className, size = 16 }: SpinnerProps) {
   return (
-    <Loader2
-      className={cn("animate-spin text-[var(--foreground-40)]", className)}
-      size={size}
-    />
+    <Loader2 className={cn("animate-spin text-[var(--foreground-40)]", className)} size={size} />
   );
 }

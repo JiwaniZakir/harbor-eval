@@ -58,10 +58,12 @@ function MilestoneCard({ milestone, accent }: { milestone: Milestone; accent: st
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className={cn(
-              "text-sm font-medium",
-              isLocked ? "text-[var(--foreground-40)]" : "text-[var(--foreground)]",
-            )}>
+            <span
+              className={cn(
+                "text-sm font-medium",
+                isLocked ? "text-[var(--foreground-40)]" : "text-[var(--foreground)]",
+              )}
+            >
               {milestone.label}
             </span>
             {milestone.source === "ai_discovered" && (
@@ -76,7 +78,11 @@ function MilestoneCard({ milestone, accent }: { milestone: Milestone; accent: st
           {isActive && (
             <div className="mt-2 flex items-center gap-2">
               <Badge variant="primary">
-                {milestone.status === "probing" ? "Probing" : milestone.status === "building" ? "Building" : "Validating"}
+                {milestone.status === "probing"
+                  ? "Probing"
+                  : milestone.status === "building"
+                    ? "Building"
+                    : "Validating"}
               </Badge>
               <Button
                 variant="ghost"
@@ -155,13 +161,8 @@ export function DomainDetailPanel() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-2.5">
-          <div
-            className="h-4 w-4 rounded-full"
-            style={{ backgroundColor: domain.accent }}
-          />
-          <h2 className="text-base font-semibold text-[var(--foreground)]">
-            {domain.label}
-          </h2>
+          <div className="h-4 w-4 rounded-full" style={{ backgroundColor: domain.accent }} />
+          <h2 className="text-base font-semibold text-[var(--foreground)]">{domain.label}</h2>
         </div>
         <Button variant="ghost" size="icon-sm" onClick={closeDetailPanel}>
           <X size={14} />
@@ -174,18 +175,14 @@ export function DomainDetailPanel() {
           <span className="text-xs font-medium text-[var(--text-secondary)]">
             {state?.milestonesCompleted || 0} of {state?.milestonesTotal || 0} milestones
           </span>
-          <span className="text-xs text-[var(--text-muted)]">
-            {state?.progress || 0}%
-          </span>
+          <span className="text-xs text-[var(--text-muted)]">{state?.progress || 0}%</span>
         </div>
         <Progress
           value={state?.progress || 0}
           indicatorClassName="transition-all duration-700"
           style={{ ["--tw-progress-color" as string]: domain.accent }}
         />
-        <p className="mt-2 text-xs text-[var(--text-muted)]">
-          {domain.description}
-        </p>
+        <p className="mt-2 text-xs text-[var(--text-muted)]">{domain.description}</p>
       </div>
 
       {/* Milestones */}

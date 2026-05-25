@@ -13,8 +13,7 @@ export function EmptyCanvas() {
       <div
         className="absolute inset-0 opacity-30"
         style={{
-          backgroundImage:
-            "radial-gradient(circle, var(--foreground-10) 1px, transparent 1px)",
+          backgroundImage: "radial-gradient(circle, var(--foreground-10) 1px, transparent 1px)",
           backgroundSize: "24px 24px",
         }}
       />
@@ -30,8 +29,7 @@ export function EmptyCanvas() {
             Harbor Eval
           </h1>
           <p className="mt-1.5 max-w-[280px] text-sm text-[var(--text-secondary)]">
-            Design evals that find where AI models fail. Start by creating a
-            campaign.
+            Design evals that find where AI models fail. Start by creating a campaign.
           </p>
         </div>
 
@@ -44,9 +42,7 @@ export function EmptyCanvas() {
           Create Campaign
         </Button>
 
-        <p className="text-xs text-[var(--text-muted)]">
-          or import from existing suite
-        </p>
+        <p className="text-xs text-[var(--text-muted)]">or import from existing suite</p>
       </div>
     </div>
   );

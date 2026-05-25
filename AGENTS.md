@@ -1,11 +1,13 @@
 # Harbor Eval - Agent Instructions
 
 ## Project Overview
+
 Harbor Eval is a visual AI evaluation platform built with Next.js 16, React 19, TypeScript, Tailwind CSS v4, React Flow, and Zustand.
 
 ## Architecture
 
 ### Directory Structure
+
 - `app/` - Next.js App Router (pages, API routes, layout)
 - `components/ui/` - Radix-based primitive components (Button, Card, Badge, etc.)
 - `components/canvas/` - React Flow canvas (CenterModelNode, DomainNode, DomainEdge)
@@ -20,12 +22,14 @@ Harbor Eval is a visual AI evaluation platform built with Next.js 16, React 19, 
 - `tests/` - Vitest unit tests
 
 ### Key Patterns
+
 - **CSS Variables for tokens** - All colors, spacing, shadows use CSS custom properties in globals.css
 - **CVA for component variants** - Button, Badge use class-variance-authority
 - **Zustand with persist** - State persisted to localStorage
 - **React Flow** - Canvas with custom node types (center, domain) and edge types (domain)
 
 ### Design System
+
 - Light theme only, warm beige background (#f1f1ee)
 - Figtree font (Google Fonts)
 - Brand accent: #7b5cf0 (purple)
@@ -34,6 +38,7 @@ Harbor Eval is a visual AI evaluation platform built with Next.js 16, React 19, 
 - Animations: scale-in-fade, fade-in-blur, slide-in-from-right, etc.
 
 ## Commands
+
 ```bash
 npm run dev        # Development server
 npm run build      # Production build
@@ -44,6 +49,7 @@ npm run check      # All quality checks
 ```
 
 ## Conventions
+
 - Conventional commits: `feat(scope): description`
 - Strict TypeScript
 - Prettier formatting (2 spaces, double quotes, trailing commas)

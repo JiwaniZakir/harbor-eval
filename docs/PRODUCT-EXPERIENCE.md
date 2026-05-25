@@ -1,4 +1,5 @@
 # Harbor Eval Canvas: Complete Product Experience
+
 ## From First Visit to Published Evaluation
 
 ---
@@ -16,6 +17,7 @@ The canvas IS the product. Every domain of evaluation (Reasoning, Safety, Instru
 ### Act 1: Landing & Campaign Creation
 
 #### First Visit (Empty State)
+
 ```
 What the user sees:
 ┌─────────────────────────────────────────────────────────────┐
@@ -39,6 +41,7 @@ What the user sees:
 │                  No sidebar, no chrome                      │
 └─────────────────────────────────────────────────────────────┘
 ```
+
 - The canvas is empty but alive -- faint dot grid, warm background
 - Single centered card with the CTA
 - No sidebar, no toolbar -- nothing to distract
@@ -47,6 +50,7 @@ What the user sees:
 #### Campaign Setup Wizard (5 Steps)
 
 **Step 1: What are you evaluating?**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ● ○ ○ ○ ○                             │
@@ -64,11 +68,13 @@ What the user sees:
 │              [Back]  [Continue →]        │
 └─────────────────────────────────────────┘
 ```
+
 - Simple text input, autofocused
 - Placeholder suggestions: "Claude Code Refactoring", "Gemini Medical QA"
 - Name appears on the center node of the canvas
 
 **Step 2: Target Model**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ● ● ○ ○ ○                             │
@@ -87,12 +93,14 @@ What the user sees:
 │              [Back]  [Continue →]        │
 └─────────────────────────────────────────┘
 ```
+
 - Provider cards with logos, selectable
 - Model dropdown filters by provider
 - API key optional (can use ours for demo)
 - This determines the "auditor" model too (cross-model by default)
 
 **Step 3: Focus Domains**
+
 ```
 ┌────────────────────────────────────────────────┐
 │  ● ● ● ○ ○                                    │
@@ -126,6 +134,7 @@ What the user sees:
 │              [Back]  [Continue →]               │
 └────────────────────────────────────────────────┘
 ```
+
 - 8 domain cards in a 2x4 grid, each with the domain accent color
 - Click to toggle selection (checkbox + fill animation)
 - Each shows domain description + preset milestone count
@@ -133,6 +142,7 @@ What the user sees:
 - Selected domains become nodes on the canvas
 
 **Step 4: Depth Configuration**
+
 ```
 ┌─────────────────────────────────────────┐
 │  ● ● ● ● ○                             │
@@ -156,12 +166,14 @@ What the user sees:
 │              [Back]  [Continue →]        │
 └─────────────────────────────────────────┘
 ```
+
 - Single slider that controls the overall depth
 - Shows computed estimates that update in real-time
 - Checkboxes for agent autonomy settings
 - "Allow AI to discover" lets the agent add milestones it finds interesting
 
 **Step 5: Review & Launch**
+
 ```
 ┌────────────────────────────────────────────┐
 │  ● ● ● ● ●                                │
@@ -186,6 +198,7 @@ What the user sees:
 │        [Back]  [🚀 Launch Campaign]        │
 └────────────────────────────────────────────┘
 ```
+
 - Summary card with all config
 - Prominent launch button with accent gradient
 - Clear expectation setting about what happens next
@@ -214,6 +227,7 @@ This 2-3 second sequence is the "wow moment" -- the user goes from nothing to a 
 ### Act 2: Exploring the Canvas
 
 #### The Canvas at Rest
+
 ```
 ┌─ Chrome ──────────────────────────────────────────────────────────────────┐
 │ [ZJ] [GPT-4o Eval ▾]              [🔍] [+] [🔔] [⚙]                    │
@@ -244,17 +258,20 @@ This 2-3 second sequence is the "wow moment" -- the user goes from nothing to a 
 ```
 
 Each domain node on the canvas shows:
+
 - **Domain icon** (28x28, custom SVG)
 - **Domain name** (18px semibold)
 - **Status indicator** (colored dot -- green=ready, amber=working, blue=probing)
 - **Quick action** (dark button: "Start probing" / "View results")
 
 The connections between center and domains are:
+
 - Solid lines (not dashed)
 - Subtle, ~10% opacity
 - Optional: flowing dot particles when agent is active
 
 #### Hovering a Domain Node
+
 ```
 Domain node grows slightly (scale 1.01)
 Shadow deepens
@@ -281,6 +298,7 @@ Transition (300ms):
 ### Act 3: Domain Detail -- Where the Real Work Happens
 
 #### Domain Detail Sidebar
+
 ```
 ┌───────────────────────────────────────────────┐
 │ DOMAIN DETAILS                           [✕]  │
@@ -334,17 +352,20 @@ Transition (300ms):
 #### Milestone States & Interactions
 
 **Locked (🔒):**
+
 - Grayed out, shows prerequisite
 - Click shows "Complete [prerequisite] first"
 - Dashed border, no shadow
 
 **Available (ready to start):**
+
 - Full color, subtle shadow
 - Click opens milestone detail OR starts agent probing
 - Shows "Start" button
 - Pulsing subtle glow to attract attention
 
 **In Progress / Probing (🔄):**
+
 - Accent-colored left border stripe
 - Live progress indicator (probe X of Y)
 - Agent status card embedded:
@@ -354,17 +375,20 @@ Transition (300ms):
 - Clicking "View Live" opens the companion panel with agent chat
 
 **Completed (✅):**
+
 - Green checkmark
 - Summary: "3 probes passed, 1 weakness found"
 - Linked artifacts (eval files, reports)
 - Click to expand full results
 
 **Failed (❌):**
+
 - Red indicator
 - Error description
 - "Retry" and "Skip" options
 
 **AI Discovered (💡):**
+
 - Special highlight (sparkle icon)
 - Agent explanation of what it found
 - Three-button action: Accept / Modify / Dismiss
@@ -381,15 +405,18 @@ Transition (300ms):
 When the user clicks "Start" on a milestone (or the agent auto-starts):
 
 **On the canvas:**
+
 - The domain node gets a pulsing accent glow
 - A small activity badge appears: "🤖 Probing..."
 - Edge from center to domain gets flowing-dot animation
 
 **In the sidebar:**
+
 - Milestone card expands to show agent activity
 - Progress bar appears: "Probe 1 of 3"
 
 **In the companion panel (if open):**
+
 ```
 ┌───────────────────────────────────────────────┐
 │ 🤖 Agent                                      │
@@ -516,19 +543,20 @@ Phase 11: PUBLISH
 
 The user is never a passive observer. At each phase:
 
-| Phase | User Can... |
-|-------|------------|
-| Weakness mapping | Approve, edit, reject weakness hypotheses |
-| Probing | Approve probes, add custom probes, skip |
-| Decision | View live results, pause agent, override decisions |
-| Scaffolding | Edit the task TOML directly in artifact viewer |
-| Fixtures | Add/edit/delete test cases manually |
-| Verifier | Adjust scoring rubric weights |
-| Sweep | Cancel sweep, change variant count |
-| Audit | Accept or request re-run |
-| Iteration | Accept improvements or finalize as-is |
+| Phase            | User Can...                                        |
+| ---------------- | -------------------------------------------------- |
+| Weakness mapping | Approve, edit, reject weakness hypotheses          |
+| Probing          | Approve probes, add custom probes, skip            |
+| Decision         | View live results, pause agent, override decisions |
+| Scaffolding      | Edit the task TOML directly in artifact viewer     |
+| Fixtures         | Add/edit/delete test cases manually                |
+| Verifier         | Adjust scoring rubric weights                      |
+| Sweep            | Cancel sweep, change variant count                 |
+| Audit            | Accept or request re-run                           |
+| Iteration        | Accept improvements or finalize as-is              |
 
 **The Approval Gate pattern:**
+
 ```
 ┌──────────────────────────────────────────────┐
 │ 🔔 Agent needs your input                    │
@@ -645,19 +673,22 @@ When a sweep completes:
 As the agent works across multiple domains, it discovers connections:
 
 **On the canvas:**
+
 - New dashed edges appear between domain nodes (not just center-to-domain)
 - These represent cross-domain dependencies
 - Hovering shows: "Multilingual Transfer affects Constraint Following"
 
 **In the sidebar:**
+
 - Cross-domain section at bottom of domain detail
 - Clickable links to jump between domains
 
 **Agent discovers a new milestone:**
+
 ```
-Agent: While probing Safety alignment, I noticed that 
-GPT-4o's refusal calibration degrades significantly 
-when the prompt is in a non-English language. This 
+Agent: While probing Safety alignment, I noticed that
+GPT-4o's refusal calibration degrades significantly
+when the prompt is in a non-English language. This
 crosses into Multilinguality.
 
 I've created a new milestone:
@@ -669,6 +700,7 @@ I've created a new milestone:
 ```
 
 This appears as:
+
 1. A notification badge (🔔 +1) on the chrome bar
 2. A card in the sidebar's "Suggested Next" section
 3. A sparkle on the relevant domain node on the canvas
@@ -680,6 +712,7 @@ This appears as:
 When all milestones across all domains are complete:
 
 **Canvas state:**
+
 ```
 All domain nodes show green checkmarks
 Center node shows: "Campaign Complete - 100%"
@@ -687,6 +720,7 @@ Confetti animation (subtle, 2 seconds)
 ```
 
 **Publish dialog:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │  🎉 Your evaluation suite is ready          │
@@ -713,86 +747,92 @@ Confetti animation (subtle, 2 seconds)
 ## All User Interactions Map
 
 ### Canvas Interactions
-| Action | What Happens |
-|--------|-------------|
-| Click domain node | Open domain detail in sidebar |
-| Double-click domain node | Zoom to domain + expand milestones on canvas |
-| Hover domain node | Scale up slightly, deepen shadow, show tooltip after 500ms |
-| Click center node | Show campaign overview / model info |
-| Click canvas background | Deselect all, return to home sidebar |
-| Scroll wheel | Zoom in/out |
-| Click-drag canvas | Pan |
-| Right-click canvas | Context menu: Fit view, Reset zoom, Add note |
-| Right-click node | Context menu: Start probing, View detail, Copy ID |
-| Drag between nodes | (future: create manual dependency) |
+
+| Action                   | What Happens                                               |
+| ------------------------ | ---------------------------------------------------------- |
+| Click domain node        | Open domain detail in sidebar                              |
+| Double-click domain node | Zoom to domain + expand milestones on canvas               |
+| Hover domain node        | Scale up slightly, deepen shadow, show tooltip after 500ms |
+| Click center node        | Show campaign overview / model info                        |
+| Click canvas background  | Deselect all, return to home sidebar                       |
+| Scroll wheel             | Zoom in/out                                                |
+| Click-drag canvas        | Pan                                                        |
+| Right-click canvas       | Context menu: Fit view, Reset zoom, Add note               |
+| Right-click node         | Context menu: Start probing, View detail, Copy ID          |
+| Drag between nodes       | (future: create manual dependency)                         |
 
 ### Sidebar Interactions
-| Action | What Happens |
-|--------|-------------|
-| Click Home tab | Show greeting, roadmap, tasks, suggestions |
-| Click Agent tab | Open companion chat panel |
-| Click Domains tab | List all domains with status |
-| Click Tasks tab | Show all milestones across all domains |
-| Click Library tab | Show all artifacts/files generated |
-| Click roadmap card | Navigate to first incomplete domain |
-| Click task item | Open that domain's detail |
-| Click suggestion | Open relevant domain + milestone |
-| Type in chat input | Send message to agent |
-| Click refresh (suggestions) | Agent regenerates suggestions |
-| Resize handle (left edge) | Drag to resize sidebar width |
+
+| Action                      | What Happens                               |
+| --------------------------- | ------------------------------------------ |
+| Click Home tab              | Show greeting, roadmap, tasks, suggestions |
+| Click Agent tab             | Open companion chat panel                  |
+| Click Domains tab           | List all domains with status               |
+| Click Tasks tab             | Show all milestones across all domains     |
+| Click Library tab           | Show all artifacts/files generated         |
+| Click roadmap card          | Navigate to first incomplete domain        |
+| Click task item             | Open that domain's detail                  |
+| Click suggestion            | Open relevant domain + milestone           |
+| Type in chat input          | Send message to agent                      |
+| Click refresh (suggestions) | Agent regenerates suggestions              |
+| Resize handle (left edge)   | Drag to resize sidebar width               |
 
 ### Milestone Interactions
-| Action | What Happens |
-|--------|-------------|
-| Click locked milestone | Show "Complete [prereq] first" message |
-| Click available milestone | Show detail + "Start" button |
-| Click "Start" button | Agent begins probing this milestone |
-| Click probing milestone | Show live agent progress |
-| Click "Pause" on active | Pause agent work |
-| Click "View Live" | Switch sidebar to companion chat, scroll to current |
-| Click "Override" | Open manual override form |
-| Click completed milestone | Show results summary + artifacts |
-| Click artifact link | Open artifact viewer |
-| Approve weakness | Move to probing phase |
-| Reject weakness | Archive it |
-| Edit weakness | Open inline editor |
-| Approve probe | Agent runs it |
-| Add custom probe | User-authored probe form |
+
+| Action                    | What Happens                                        |
+| ------------------------- | --------------------------------------------------- |
+| Click locked milestone    | Show "Complete [prereq] first" message              |
+| Click available milestone | Show detail + "Start" button                        |
+| Click "Start" button      | Agent begins probing this milestone                 |
+| Click probing milestone   | Show live agent progress                            |
+| Click "Pause" on active   | Pause agent work                                    |
+| Click "View Live"         | Switch sidebar to companion chat, scroll to current |
+| Click "Override"          | Open manual override form                           |
+| Click completed milestone | Show results summary + artifacts                    |
+| Click artifact link       | Open artifact viewer                                |
+| Approve weakness          | Move to probing phase                               |
+| Reject weakness           | Archive it                                          |
+| Edit weakness             | Open inline editor                                  |
+| Approve probe             | Agent runs it                                       |
+| Add custom probe          | User-authored probe form                            |
 
 ### Agent Chat Interactions
-| Action | What Happens |
-|--------|-------------|
-| Type + send | Message goes to agent |
-| Click tool call card | Expand/collapse tool call details |
-| Click "Expand Results" | Show full tool output |
-| Approve/Reject inline | Respond to agent's approval request |
-| Click code block | Copy to clipboard |
-| Click artifact reference | Open artifact viewer |
-| Scroll up | Load older messages |
+
+| Action                   | What Happens                        |
+| ------------------------ | ----------------------------------- |
+| Type + send              | Message goes to agent               |
+| Click tool call card     | Expand/collapse tool call details   |
+| Click "Expand Results"   | Show full tool output               |
+| Approve/Reject inline    | Respond to agent's approval request |
+| Click code block         | Copy to clipboard                   |
+| Click artifact reference | Open artifact viewer                |
+| Scroll up                | Load older messages                 |
 
 ### Chrome Bar Interactions
-| Action | What Happens |
-|--------|-------------|
-| Click avatar | Account menu dropdown |
-| Click org name | Org/campaign switcher |
-| Click search | Open command palette (Cmd+K) |
+
+| Action           | What Happens                              |
+| ---------------- | ----------------------------------------- |
+| Click avatar     | Account menu dropdown                     |
+| Click org name   | Org/campaign switcher                     |
+| Click search     | Open command palette (Cmd+K)              |
 | Click + (create) | New milestone / new probe / new note menu |
-| Click bell | Notification inbox popover |
-| Click gear | Settings panel |
+| Click bell       | Notification inbox popover                |
+| Click gear       | Settings panel                            |
 
 ### Keyboard Shortcuts
-| Keys | Action |
-|------|--------|
-| `Cmd+K` | Command palette |
-| `Cmd+/` | Toggle agent chat |
-| `Escape` | Close topmost panel |
-| `1-8` | Jump to domain 1-8 |
-| `Space` | Fit canvas to view |
-| `Cmd+Enter` | Send chat message |
-| `Cmd+S` | Save artifact edits |
-| `Tab` | Navigate between UI regions |
-| `Arrow keys` | Pan canvas (when focused) |
-| `+` / `-` | Zoom in/out |
+
+| Keys         | Action                      |
+| ------------ | --------------------------- |
+| `Cmd+K`      | Command palette             |
+| `Cmd+/`      | Toggle agent chat           |
+| `Escape`     | Close topmost panel         |
+| `1-8`        | Jump to domain 1-8          |
+| `Space`      | Fit canvas to view          |
+| `Cmd+Enter`  | Send chat message           |
+| `Cmd+S`      | Save artifact edits         |
+| `Tab`        | Navigate between UI regions |
+| `Arrow keys` | Pan canvas (when focused)   |
+| `+` / `-`    | Zoom in/out                 |
 
 ---
 

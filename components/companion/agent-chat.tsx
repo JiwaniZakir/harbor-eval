@@ -25,7 +25,7 @@ const DEMO_MESSAGES: ChatMessage[] = [
     id: "welcome-1",
     role: "assistant",
     content:
-      "I've set up your evaluation canvas. I can see your domains are ready for probing. Click \"Start Probing\" on any milestone, or ask me to suggest where to begin.",
+      'I\'ve set up your evaluation canvas. I can see your domains are ready for probing. Click "Start Probing" on any milestone, or ask me to suggest where to begin.',
     createdAt: Date.now() - 60000,
     phase: "intake",
   },
@@ -48,9 +48,7 @@ function ToolCallCard({ toolCall }: { toolCall: ToolCall }) {
         className="flex w-full items-center gap-2 px-2.5 py-1.5 text-left hover:bg-[var(--foreground-5)] transition-colors rounded-[var(--radius-md)]"
       >
         {statusIcon}
-        <span className="flex-1 font-mono text-[var(--text-secondary)]">
-          {toolCall.name}
-        </span>
+        <span className="flex-1 font-mono text-[var(--text-secondary)]">{toolCall.name}</span>
         {toolCall.finishedAt && toolCall.startedAt && (
           <span className="text-[var(--text-muted)]">
             {((toolCall.finishedAt - toolCall.startedAt) / 1000).toFixed(1)}s
@@ -108,12 +106,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   const isUser = message.role === "user";
 
   return (
-    <div
-      className={cn(
-        "flex gap-2.5",
-        isUser ? "flex-row-reverse" : "flex-row",
-      )}
-    >
+    <div className={cn("flex gap-2.5", isUser ? "flex-row-reverse" : "flex-row")}>
       {/* Avatar */}
       <div
         className={cn(
@@ -136,9 +129,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         )}
 
         {/* Plan steps */}
-        {message.plan && message.plan.length > 0 && (
-          <PlanDisplay steps={message.plan} />
-        )}
+        {message.plan && message.plan.length > 0 && <PlanDisplay steps={message.plan} />}
 
         {/* Message text */}
         <div
@@ -226,10 +217,7 @@ export function AgentChat() {
   return (
     <div className="flex h-full flex-col">
       {/* Messages */}
-      <div
-        ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 pb-4"
-      >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4">
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
@@ -241,9 +229,7 @@ export function AgentChat() {
             </div>
             <div className="flex items-center gap-2 rounded-[var(--radius-lg)] bg-[var(--bg-card)] px-3 py-2 shadow-[var(--shadow-sm)] border border-[var(--border-subtle)]">
               <Spinner size={14} />
-              <span className="text-xs text-[var(--text-muted)]">
-                Thinking...
-              </span>
+              <span className="text-xs text-[var(--text-muted)]">Thinking...</span>
             </div>
           </div>
         )}

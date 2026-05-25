@@ -2,11 +2,7 @@
 
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import type {
-  SidebarTab,
-  DetailPanelPayload,
-  DomainId,
-} from "@/lib/types";
+import type { SidebarTab, DetailPanelPayload, DomainId } from "@/lib/types";
 
 interface UIStore {
   // Sidebar
@@ -52,21 +48,18 @@ export const useUIStore = create<UIStore>()(
       // Detail panel
       detailPanelOpen: false,
       detailPayload: null,
-      openDetailPanel: (payload) =>
-        set({ detailPanelOpen: true, detailPayload: payload }),
+      openDetailPanel: (payload) => set({ detailPanelOpen: true, detailPayload: payload }),
       closeDetailPanel: () =>
         set({ detailPanelOpen: false, detailPayload: null, focusedDomainId: null }),
 
       // Companion
       companionOpen: false,
-      toggleCompanion: () =>
-        set((s) => ({ companionOpen: !s.companionOpen })),
+      toggleCompanion: () => set((s) => ({ companionOpen: !s.companionOpen })),
       setCompanionOpen: (open) => set({ companionOpen: open }),
 
       // Command palette
       commandPaletteOpen: false,
-      toggleCommandPalette: () =>
-        set((s) => ({ commandPaletteOpen: !s.commandPaletteOpen })),
+      toggleCommandPalette: () => set((s) => ({ commandPaletteOpen: !s.commandPaletteOpen })),
       setCommandPaletteOpen: (open) => set({ commandPaletteOpen: open }),
 
       // Setup wizard

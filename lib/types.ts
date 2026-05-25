@@ -200,12 +200,7 @@ export interface WeaknessCandidate extends WeaknessCard {
 
 // ─── Project Types ───────────────────────────────────────────────────────────
 
-export type ProjectStatus =
-  | "setup"
-  | "active"
-  | "paused"
-  | "reviewing"
-  | "completed";
+export type ProjectStatus = "setup" | "active" | "paused" | "reviewing" | "completed";
 
 export interface TargetModelConfig {
   provider: "openai" | "anthropic" | "google";

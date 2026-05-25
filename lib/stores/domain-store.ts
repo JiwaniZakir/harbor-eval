@@ -54,9 +54,7 @@ function recomputeDomainProgress(
   const updated = { ...domainStates };
   for (const domain of DOMAINS) {
     const domainMilestones = milestones.filter((m) => m.domainId === domain.id);
-    const completed = domainMilestones.filter(
-      (m) => m.status === "completed",
-    ).length;
+    const completed = domainMilestones.filter((m) => m.status === "completed").length;
     const total = domainMilestones.length;
     const hasProbing = domainMilestones.some((m) =>
       ["probing", "building", "validating", "in_progress"].includes(m.status),
@@ -163,11 +161,7 @@ export const useDomainStore = create<DomainStore>()(
       refreshSuggestedProbes() {
         const { milestones, domainStates } = get();
         const probes: SuggestedProbe[] = milestones
-          .filter(
-            (m) =>
-              m.status === "available" &&
-              domainStates[m.domainId]?.status !== "locked",
-          )
+          .filter((m) => m.status === "available" && domainStates[m.domainId]?.status !== "locked")
           .slice(0, 5)
           .map((m) => ({
             id: `probe-${m.id}`,
@@ -183,9 +177,7 @@ export const useDomainStore = create<DomainStore>()(
       getGlobalProgress() {
         const { milestones } = get();
         if (milestones.length === 0) return 0;
-        const completed = milestones.filter(
-          (m) => m.status === "completed",
-        ).length;
+        const completed = milestones.filter((m) => m.status === "completed").length;
         return Math.round((completed / milestones.length) * 100);
       },
 

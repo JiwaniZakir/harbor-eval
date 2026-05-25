@@ -2,12 +2,7 @@
 
 import { Search, Plus, Bell, Settings, Compass } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { useProjectStore } from "@/lib/stores/project-store";
@@ -25,11 +20,7 @@ export function ChromeBar() {
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="glass"
-                size="icon-sm"
-                className="rounded-full text-xs font-semibold"
-              >
+              <Button variant="glass" size="icon-sm" className="rounded-full text-xs font-semibold">
                 <Compass size={14} />
               </Button>
             </TooltipTrigger>
@@ -78,11 +69,7 @@ export function ChromeBar() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="glass"
-                size="icon-sm"
-                className="relative rounded-full"
-              >
+              <Button variant="glass" size="icon-sm" className="relative rounded-full">
                 <Bell size={14} />
                 {notificationCount > 0 && (
                   <Badge
@@ -99,11 +86,7 @@ export function ChromeBar() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button
-                variant="glass"
-                size="icon-sm"
-                className="rounded-full"
-              >
+              <Button variant="glass" size="icon-sm" className="rounded-full">
                 <Settings size={14} />
               </Button>
             </TooltipTrigger>

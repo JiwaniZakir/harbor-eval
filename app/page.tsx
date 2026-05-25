@@ -63,11 +63,7 @@ export default function WorkspacePage() {
       params.delete("domain");
     }
     const qs = params.toString();
-    window.history.replaceState(
-      {},
-      "",
-      qs ? `?${qs}` : window.location.pathname,
-    );
+    window.history.replaceState({}, "", qs ? `?${qs}` : window.location.pathname);
   }, [focusedDomainId]);
 
   // Restore domain from URL on mount
@@ -75,12 +71,8 @@ export default function WorkspacePage() {
     const params = new URLSearchParams(window.location.search);
     const domain = params.get("domain");
     if (domain) {
-      useUIStore
-        .getState()
-        .setFocusedDomain(domain as DomainId);
-      useUIStore
-        .getState()
-        .openDetailPanel({ kind: "domain", domainId: domain as DomainId });
+      useUIStore.getState().setFocusedDomain(domain as DomainId);
+      useUIStore.getState().openDetailPanel({ kind: "domain", domainId: domain as DomainId });
     }
   }, []);
 
@@ -93,9 +85,7 @@ export default function WorkspacePage() {
         {/* Main content area */}
         <div className="flex min-h-0 flex-1">
           {/* Canvas (full viewport) */}
-          <div className="relative flex-1">
-            {project ? <CanvasShell /> : <EmptyCanvas />}
-          </div>
+          <div className="relative flex-1">{project ? <CanvasShell /> : <EmptyCanvas />}</div>
 
           {/* Floating sidebar */}
           {project && (
@@ -103,11 +93,7 @@ export default function WorkspacePage() {
               <div className="flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--bg-sidebar)] shadow-[var(--shadow-md)]">
                 {/* Inner content */}
                 <div className="flex-1 overflow-y-auto rounded-[10px] bg-[var(--bg-sidebar-inner)] m-1.5 p-3">
-                  {detailPanelOpen && focusedDomainId ? (
-                    <DomainDetailPanel />
-                  ) : (
-                    <SidebarContent />
-                  )}
+                  {detailPanelOpen && focusedDomainId ? <DomainDetailPanel /> : <SidebarContent />}
                 </div>
               </div>
             </div>

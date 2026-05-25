@@ -49,9 +49,7 @@ function buildCanvasElements(
   });
 
   // Domain nodes in radial layout
-  const activeDomains = DOMAINS.filter(
-    (d) => domainStates[d.id]?.status !== "locked",
-  );
+  const activeDomains = DOMAINS.filter((d) => domainStates[d.id]?.status !== "locked");
   const radius = 320;
   const angleStep = (2 * Math.PI) / Math.max(activeDomains.length, 1);
   const startAngle = -Math.PI / 2; // Start from top
@@ -99,12 +97,7 @@ export function CanvasShell() {
   const closeDetailPanel = useUIStore((s) => s.closeDetailPanel);
 
   const { nodes: initialNodes, edges: initialEdges } = useMemo(
-    () =>
-      buildCanvasElements(
-        project?.name || "Harbor Eval",
-        domainStates,
-        focusedDomainId,
-      ),
+    () => buildCanvasElements(project?.name || "Harbor Eval", domainStates, focusedDomainId),
     [project?.name, domainStates, focusedDomainId],
   );
 

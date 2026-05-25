@@ -54,9 +54,7 @@ function DomainNodeComponent({ data }: NodeProps) {
         )}
         style={{
           borderColor: isFocused ? domain.accent : undefined,
-          boxShadow: isFocused
-            ? `0 0 0 1px ${domain.accent}22, var(--shadow-lg)`
-            : undefined,
+          boxShadow: isFocused ? `0 0 0 1px ${domain.accent}22, var(--shadow-lg)` : undefined,
         }}
       >
         {/* Domain color dot */}

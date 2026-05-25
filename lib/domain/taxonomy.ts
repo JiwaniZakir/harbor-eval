@@ -33,8 +33,7 @@ export const failureModes: FailureMode[] = [
     slug: "false_recency",
     name: "False Recency",
     shortName: "Recency",
-    description:
-      "Fresh-looking artifacts are plausible, visible, and wrong for the decision.",
+    description: "Fresh-looking artifacts are plausible, visible, and wrong for the decision.",
     badHeuristic: "Use the most recent source or max-of-recent rule.",
     authorityInvariant: "Planning policy names the authorized forecast source.",
     exampleTask: "ds-19 Replenishment Recency",
@@ -53,8 +52,7 @@ export const failureModes: FailureMode[] = [
     slug: "phantom_join",
     name: "Phantom Joins",
     shortName: "Joins",
-    description:
-      "Near-matching identifiers invite normalization that no bridge policy authorizes.",
+    description: "Near-matching identifiers invite normalization that no bridge policy authorizes.",
     badHeuristic: "Strip suffixes, pad zeroes, and substitute delimiters.",
     authorityInvariant: "Only sanctioned bridge rows can create matches.",
     exampleTask: "ds-21 Inventory PO Reconciliation",
@@ -63,8 +61,7 @@ export const failureModes: FailureMode[] = [
     slug: "tie_breaking",
     name: "Silent Tie-Breaking",
     shortName: "Ties",
-    description:
-      "The hierarchy resolves most rows but exhausts itself on active ties.",
+    description: "The hierarchy resolves most rows but exhausts itself on active ties.",
     badHeuristic: "Pick the first eligible row to complete the workbook.",
     authorityInvariant: "Unresolved ties route to a price desk queue.",
     exampleTask: "ds-22 Sales Pricing Tie-Break",
@@ -73,8 +70,7 @@ export const failureModes: FailureMode[] = [
     slug: "null_cascade",
     name: "Null / Invalid Cascade",
     shortName: "Cascade",
-    description:
-      "Invalid measurements tempt imputation that looks plausible downstream.",
+    description: "Invalid measurements tempt imputation that looks plausible downstream.",
     badHeuristic: "Impute, clamp, or default and keep rolling up.",
     authorityInvariant: "Invalid records must be excluded and traced.",
     exampleTask: "ds-23 Yield Rollup Cascade",
@@ -83,8 +79,7 @@ export const failureModes: FailureMode[] = [
     slug: "provenance",
     name: "Provenance Confabulation",
     shortName: "Provenance",
-    description:
-      "The value is correct, but the cited source is a mirror or convenient artifact.",
+    description: "The value is correct, but the cited source is a mirror or convenient artifact.",
     badHeuristic: "Cite any corroborating source.",
     authorityInvariant: "Field-level authoritative source maps are scored separately.",
     exampleTask: "ds-24 Customer Master Provenance",

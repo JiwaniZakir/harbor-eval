@@ -16,9 +16,21 @@ import { X, ArrowRight, ArrowLeft, Rocket, Check } from "lucide-react";
 type Provider = "openai" | "anthropic" | "google";
 
 const PROVIDERS: { id: Provider; label: string; models: string[] }[] = [
-  { id: "openai", label: "OpenAI", models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "o1-mini", "o1-preview"] },
-  { id: "anthropic", label: "Anthropic", models: ["claude-sonnet-4-20250514", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"] },
-  { id: "google", label: "Google", models: ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"] },
+  {
+    id: "openai",
+    label: "OpenAI",
+    models: ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo", "o1-mini", "o1-preview"],
+  },
+  {
+    id: "anthropic",
+    label: "Anthropic",
+    models: ["claude-sonnet-4-20250514", "claude-3-5-haiku-20241022", "claude-3-opus-20240229"],
+  },
+  {
+    id: "google",
+    label: "Google",
+    models: ["gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash"],
+  },
 ];
 
 export function SetupWizard() {
@@ -60,9 +72,7 @@ export function SetupWizard() {
 
   const toggleDomain = (id: DomainId) => {
     setSelectedDomains((prev) =>
-      prev.includes(id)
-        ? prev.filter((d) => d !== id)
-        : [...prev, id],
+      prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id],
     );
   };
 
@@ -82,9 +92,7 @@ export function SetupWizard() {
                       key={s}
                       className={cn(
                         "h-1.5 w-1.5 rounded-full transition-colors",
-                        i <= step
-                          ? "bg-[var(--brand-primary)]"
-                          : "bg-[var(--foreground-10)]",
+                        i <= step ? "bg-[var(--brand-primary)]" : "bg-[var(--foreground-10)]",
                       )}
                     />
                   ))}
@@ -151,10 +159,7 @@ export function SetupWizard() {
                       >
                         <div className="text-sm font-medium">{p.label}</div>
                         {provider === p.id && (
-                          <Check
-                            size={12}
-                            className="mx-auto mt-1 text-[var(--brand-primary)]"
-                          />
+                          <Check size={12} className="mx-auto mt-1 text-[var(--brand-primary)]" />
                         )}
                       </button>
                     ))}
@@ -211,17 +216,13 @@ export function SetupWizard() {
                                 : "border-[var(--border)]",
                             )}
                             style={{
-                              backgroundColor: isSelected
-                                ? domain.accent
-                                : "transparent",
+                              backgroundColor: isSelected ? domain.accent : "transparent",
                             }}
                           >
                             {isSelected && <Check size={12} />}
                           </div>
                           <div className="min-w-0">
-                            <div className="text-xs font-medium">
-                              {domain.shortLabel}
-                            </div>
+                            <div className="text-xs font-medium">{domain.shortLabel}</div>
                             <div className="mt-0.5 text-[10px] text-[var(--text-muted)] line-clamp-2">
                               {domain.description}
                             </div>
@@ -302,11 +303,7 @@ export function SetupWizard() {
                   <ArrowRight size={14} />
                 </Button>
               ) : (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={handleLaunch}
-                >
+                <Button variant="primary" size="sm" onClick={handleLaunch}>
                   <Rocket size={14} />
                   Launch Campaign
                 </Button>
