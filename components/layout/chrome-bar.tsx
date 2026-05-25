@@ -15,6 +15,7 @@ export function ChromeBar() {
   const setSetupWizardOpen = useUIStore((s) => s.setSetupWizardOpen);
   const notificationCount = useUIStore((s) => s.notificationCount);
   const currentPhase = useAgentStore((s) => s.currentPhase);
+  const toggleSettings = useUIStore((s) => s.toggleSettings);
 
   return (
     <div className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-chrome)] flex items-center justify-between px-4 py-3">
@@ -98,7 +99,12 @@ export function ChromeBar() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="glass" size="icon-sm" className="rounded-full">
+              <Button
+                variant="glass"
+                size="icon-sm"
+                className="rounded-full"
+                onClick={toggleSettings}
+              >
                 <Settings size={14} />
               </Button>
             </TooltipTrigger>

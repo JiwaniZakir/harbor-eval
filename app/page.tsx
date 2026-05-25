@@ -8,6 +8,8 @@ import { CanvasShell } from "@/components/canvas/canvas-shell";
 import { EmptyCanvas } from "@/components/canvas/empty-canvas";
 import { SetupWizard } from "@/components/studio/setup-wizard";
 import { CommandPalette } from "@/components/studio/command-palette";
+import { SettingsPanel } from "@/components/studio/settings-panel";
+import { ToastContainer } from "@/components/ui/toast";
 import { DomainDetailPanel } from "@/components/domain/domain-detail-panel";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { useProjectStore } from "@/lib/stores/project-store";
@@ -19,6 +21,8 @@ export default function WorkspacePage() {
   const project = useProjectStore((s) => s.project);
   const focusedDomainId = useUIStore((s) => s.focusedDomainId);
   const detailPanelOpen = useUIStore((s) => s.detailPanelOpen);
+  const settingsOpen = useUIStore((s) => s.settingsOpen);
+  const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -42,6 +46,10 @@ export default function WorkspacePage() {
         }
         if (ui.setupWizardOpen) {
           ui.setSetupWizardOpen(false);
+          return;
+        }
+        if (ui.settingsOpen) {
+          ui.setSettingsOpen(false);
           return;
         }
         if (ui.detailPanelOpen) {
@@ -103,6 +111,8 @@ export default function WorkspacePage() {
         {/* Overlays */}
         <SetupWizard />
         <CommandPalette />
+        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+        <ToastContainer />
       </div>
     </ReactFlowProvider>
   );

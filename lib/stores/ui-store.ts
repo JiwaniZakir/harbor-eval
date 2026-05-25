@@ -36,6 +36,11 @@ interface UIStore {
   // Notifications
   notificationCount: number;
   setNotificationCount: (count: number) => void;
+
+  // Settings panel
+  settingsOpen: boolean;
+  setSettingsOpen: (open: boolean) => void;
+  toggleSettings: () => void;
 }
 
 export const useUIStore = create<UIStore>()(
@@ -73,6 +78,11 @@ export const useUIStore = create<UIStore>()(
       // Notifications
       notificationCount: 0,
       setNotificationCount: (count) => set({ notificationCount: count }),
+
+      // Settings panel
+      settingsOpen: false,
+      setSettingsOpen: (open) => set({ settingsOpen: open }),
+      toggleSettings: () => set((s) => ({ settingsOpen: !s.settingsOpen })),
     }),
     {
       name: "harbor-ui",
