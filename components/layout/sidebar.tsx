@@ -17,6 +17,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import type { SidebarTab, DomainId } from "@/lib/types";
+import { AgentChat } from "@/components/companion/agent-chat";
 
 const TABS: { id: SidebarTab; label: string; icon: React.ReactNode }[] = [
   { id: "home", label: "Home", icon: <Home size={16} /> },
@@ -228,6 +229,70 @@ function DomainsContent() {
   );
 }
 
+function TasksContent() {
+  const milestones = useDomainStore((s) => s.milestones);
+  const openDetailPanel = useUIStore((s) => s.openDetailPanel);
+  const setFocusedDomain = useUIStore((s) => s.setFocusedDomain);
+
+  const grouped = milestones.reduce(
+    (acc, m) => {
+      const key = m.status;
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(m);
+      return acc;
+    },
+    {} as Record<string, typeof milestones>,
+  );
+
+  const sections = [
+    { key: "probing", label: "Active", items: [...(grouped.probing || []), ...(grouped.building || []), ...(grouped.validating || []), ...(grouped.in_progress || [])] },
+    { key: "available", label: "Available", items: grouped.available || [] },
+    { key: "completed", label: "Completed", items: grouped.completed || [] },
+    { key: "locked", label: "Locked", items: grouped.locked || [] },
+  ].filter((s) => s.items.length > 0);
+
+  return (
+    <div className="flex flex-col gap-4">
+      <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+        All Milestones ({milestones.length})
+      </h3>
+      {sections.map((section) => (
+        <div key={section.key}>
+          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-[var(--foreground-30)]">
+            {section.label} ({section.items.length})
+          </div>
+          <div className="flex flex-col gap-0.5">
+            {section.items.map((m) => {
+              const domain = DOMAINS.find((d) => d.id === m.domainId);
+              return (
+                <button
+                  key={m.id}
+                  onClick={() => {
+                    setFocusedDomain(m.domainId);
+                    openDetailPanel({ kind: "domain", domainId: m.domainId });
+                  }}
+                  className="flex items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--foreground-5)]"
+                >
+                  <div
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: domain?.accent }}
+                  />
+                  <span className="flex-1 truncate text-xs text-[var(--foreground-70)]">
+                    {m.label}
+                  </span>
+                  <span className="text-[10px] text-[var(--text-muted)]">
+                    {domain?.shortLabel}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function PlaceholderContent({ label }: { label: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
@@ -250,13 +315,9 @@ export function Sidebar() {
       {/* Content */}
       <div className="animate-fade-blur">
         {activeTab === "home" && <HomeContent />}
-        {activeTab === "agent" && (
-          <PlaceholderContent label="Agent Chat" />
-        )}
+        {activeTab === "agent" && <AgentChat />}
         {activeTab === "domains" && <DomainsContent />}
-        {activeTab === "tasks" && (
-          <PlaceholderContent label="All Tasks" />
-        )}
+        {activeTab === "tasks" && <TasksContent />}
         {activeTab === "library" && (
           <PlaceholderContent label="Artifact Library" />
         )}
