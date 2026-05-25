@@ -2,11 +2,23 @@
  * Agent tool definitions for the Harbor Eval orchestrator.
  *
  * Uses AI SDK v6 tool() with inputSchema (zod v4).
- * Phase 2 will replace stub implementations with real AI pipeline calls.
+ * Delegates to lib/ai/ and lib/harbor/ pipeline modules.
  */
 
 import { z } from "zod";
 import { tool } from "ai";
+import { analyzeWorkflow } from "@/lib/ai/workflow-intake";
+import { mapWeaknesses, promoteCandidate } from "@/lib/ai/weakness-map";
+import { runProbeVariants as probeVariants, batchProbe } from "@/lib/ai/probe-runner";
+import { renderDecisionReport } from "@/lib/ai/decision-report";
+import { scaffoldTask as scaffold } from "@/lib/ai/scaffold-generator";
+import { generateFixtures as genFixtures } from "@/lib/ai/fixture-generator";
+import { lintSpoilers as lint } from "@/lib/ai/spoiler-lint";
+import { auditTrajectory as audit } from "@/lib/ai/trajectory-audit";
+import type { LanguageModel } from "ai";
+
+// Placeholder model for pipeline calls that ignore the model arg (mock mode)
+const MOCK_MODEL = undefined as unknown as LanguageModel;
 
 // ─── Workspace Tools ─────────────────────────────────────────────────────────
 
@@ -24,7 +36,11 @@ export const readArtifact = tool({
     path: z.string().describe("Artifact file path"),
   }),
   execute: async ({ path }) => {
-    return { path, content: null as string | null, message: `Artifact ${path} not found.` };
+    return {
+      path,
+      content: null as string | null,
+      message: `Artifact ${path} not found.`,
+    };
   },
 });
 
@@ -49,30 +65,17 @@ export const mapWorkflowWeaknesses = tool({
       .describe("Natural language description of the workflow to evaluate"),
   }),
   execute: async ({ workflowDescription }) => {
+    const report = await mapWeaknesses(workflowDescription, MOCK_MODEL);
     return {
       workflowDescription,
-      candidates: [
-        {
-          slug: "temporal-ordering",
-          title: "Temporal ordering under constraint propagation",
-          severity: 0.85,
-          reasoning: "Models frequently mis-order dependent steps when constraints cascade.",
-        },
-        {
-          slug: "quantity-tracking",
-          title: "Multi-unit quantity tracking across transforms",
-          severity: 0.78,
-          reasoning:
-            "Numerical precision degrades across chained operations with unit conversions.",
-        },
-        {
-          slug: "cross-reference-integrity",
-          title: "Cross-reference integrity in multi-document workflows",
-          severity: 0.72,
-          reasoning: "Reference resolution fails when IDs span multiple artifact boundaries.",
-        },
-      ],
-      message: `Mapped 3 weakness candidates for the workflow.`,
+      candidates: report.candidates.map((c) => ({
+        slug: c.slug,
+        weaknessTitle: c.weaknessTitle,
+        workflowFitScore: c.workflowFitScore,
+        hypothesis: c.hypothesis,
+        taxonomySlug: c.taxonomySlug,
+      })),
+      message: `Mapped ${report.candidates.length} weakness candidates.`,
     };
   },
 });
@@ -81,12 +84,16 @@ export const intakeWorkflow = tool({
   description: "Promote a weakness candidate into the active weakness card for probing.",
   inputSchema: z.object({
     slug: z.string().describe("Weakness candidate slug to promote"),
+    workflowDescription: z.string().default("").describe("Original workflow description"),
   }),
-  execute: async ({ slug }) => {
+  execute: async ({ slug, workflowDescription }) => {
+    const candidates = await analyzeWorkflow(workflowDescription, MOCK_MODEL);
+    const card = promoteCandidate(slug, candidates);
     return {
       slug,
+      weaknessTitle: card.weaknessTitle,
       promoted: true,
-      message: `Promoted "${slug}" to active weakness card.`,
+      message: `Promoted "${card.weaknessTitle}" to active weakness card.`,
     };
   },
 });
@@ -100,60 +107,69 @@ export const batchProbeCandidates = tool({
     trialsPerVariant: z.number().default(15).describe("Number of trials per variant"),
   }),
   execute: async ({ slugs, trialsPerVariant }) => {
+    // Create minimal weakness cards for each slug
+    const cards = slugs.map((slug: string) => ({
+      weaknessTitle: slug.replace(/-/g, " "),
+      domain: "instruction_following",
+      deliverable: "Test deliverable",
+      hypothesis: `Hypothesis for ${slug}`,
+      badHeuristic: "Pattern match",
+      authorityInvariant: "Ground truth",
+      taxonomySlug: slug as never,
+      workflowFitScore: 0.8,
+      verifierStrategy: "deterministic",
+    }));
+    const summaries = await batchProbe(cards, MOCK_MODEL, trialsPerVariant);
     return {
       slugs,
       trialsPerVariant,
-      summaries: slugs.map((slug: string) => ({
-        weaknessTitle: slug,
-        variants: [
-          {
-            variant: "direct",
-            failureRate: 0.87,
-            trials: trialsPerVariant,
-            failures: Math.round(trialsPerVariant * 0.87),
-          },
-          {
-            variant: "adversarial",
-            failureRate: 0.93,
-            trials: trialsPerVariant,
-            failures: Math.round(trialsPerVariant * 0.93),
-          },
-        ],
-        verdict: "promote" as const,
+      summaries: summaries.map((s) => ({
+        weaknessTitle: s.weaknessTitle,
+        variants: s.variants,
+        verdict: s.verdict,
       })),
       message: `Probed ${slugs.length} candidates.`,
     };
   },
 });
 
-export const runProbeVariants = tool({
+export const runProbeVariantsT = tool({
   description: "Execute 5 pressure variants for the active weakness card against the target model.",
   inputSchema: z.object({
     weaknessSlug: z.string().describe("Active weakness slug"),
   }),
   execute: async ({ weaknessSlug }) => {
+    const card = {
+      weaknessTitle: weaknessSlug.replace(/-/g, " "),
+      domain: "instruction_following",
+      deliverable: "Test deliverable",
+      hypothesis: `Hypothesis for ${weaknessSlug}`,
+      badHeuristic: "Pattern match",
+      authorityInvariant: "Ground truth",
+      taxonomySlug: weaknessSlug as never,
+      workflowFitScore: 0.8,
+      verifierStrategy: "deterministic",
+    };
+    const summary = await probeVariants(card, MOCK_MODEL);
     return {
       weaknessSlug,
-      variants: [
-        { variant: "baseline", failureRate: 0.6, trials: 15, failures: 9 },
-        { variant: "adversarial", failureRate: 0.87, trials: 15, failures: 13 },
-        { variant: "edge-case", failureRate: 0.73, trials: 15, failures: 11 },
-        { variant: "multi-step", failureRate: 0.93, trials: 15, failures: 14 },
-        { variant: "distraction", failureRate: 0.8, trials: 15, failures: 12 },
-      ],
-      verdict: "promote",
-      message: `Probed 5 variants for "${weaknessSlug}". Verdict: promote.`,
+      variants: summary.variants,
+      verdict: summary.verdict,
+      message: `Probed variants for "${weaknessSlug}". Verdict: ${summary.verdict}.`,
     };
   },
 });
 
-export const renderProbeDecisionReport = tool({
+export const renderProbeDecisionReportT = tool({
   description: "Summarize probe verdicts into a structured decision report.",
   inputSchema: z.object({}),
   execute: async () => {
+    const entries = renderDecisionReport([]);
     return {
-      entries: [] as Array<{ slug: string; verdict: string }>,
-      message: "No probe results to summarize yet.",
+      entries,
+      message: entries.length
+        ? `Generated decision report with ${entries.length} entries.`
+        : "No probe results to summarize yet.",
     };
   },
 });
@@ -168,11 +184,23 @@ export const scaffoldTask = tool({
     taskTitle: z.string().describe("Human-readable task title"),
   }),
   execute: async ({ weaknessSlug, taskTitle }) => {
+    const card = {
+      weaknessTitle: taskTitle,
+      domain: "instruction_following",
+      deliverable: "Test deliverable",
+      hypothesis: `Hypothesis for ${weaknessSlug}`,
+      badHeuristic: "Pattern match",
+      authorityInvariant: "Ground truth",
+      taxonomySlug: weaknessSlug as never,
+      workflowFitScore: 0.8,
+      verifierStrategy: "deterministic",
+    };
+    const files = await scaffold(card, taskTitle);
     return {
       weaknessSlug,
       taskTitle,
-      files: ["instruction.md", "task.toml", "Dockerfile", "solve.sh", "tests/test_verifier.py"],
-      message: `Scaffolded task pack for "${taskTitle}".`,
+      files: Array.from(files.keys()),
+      message: `Scaffolded ${files.size} files for "${taskTitle}".`,
     };
   },
 });
@@ -183,10 +211,22 @@ export const generateFixtures = tool({
     count: z.number().default(5).describe("Number of fixtures to generate"),
   }),
   execute: async ({ count }) => {
+    const card = {
+      weaknessTitle: "Current weakness",
+      domain: "instruction_following",
+      deliverable: "Test deliverable",
+      hypothesis: "Hypothesis",
+      badHeuristic: "Pattern match",
+      authorityInvariant: "Ground truth",
+      taxonomySlug: "current-weakness" as never,
+      workflowFitScore: 0.8,
+      verifierStrategy: "deterministic",
+    };
+    const artifacts = await genFixtures(card, count);
     return {
       count,
-      files: Array.from({ length: count }, (_, i) => `fixture_${i + 1}.json`),
-      message: `Generated ${count} fixtures.`,
+      files: artifacts.map((a) => a.path),
+      message: `Generated ${artifacts.length} fixtures.`,
     };
   },
 });
@@ -197,12 +237,21 @@ export const lintSpoilers = tool({
   description: "Run line-anchored regex + heuristic spoiler scan over an artifact.",
   inputSchema: z.object({
     path: z.string().describe("Artifact path to lint"),
+    content: z.string().default("").describe("Content to lint (if not reading from workspace)"),
   }),
-  execute: async ({ path }) => {
+  execute: async ({ path, content }) => {
+    const findings = lint(content, path);
     return {
       path,
-      findings: [] as Array<{ line: number; message: string }>,
-      message: `No spoilers found in ${path}.`,
+      findings: findings.map((f) => ({
+        line: f.line,
+        severity: f.severity,
+        ruleId: f.ruleId,
+        message: f.message,
+      })),
+      message: findings.length
+        ? `Found ${findings.length} spoiler(s) in ${path}.`
+        : `No spoilers found in ${path}.`,
     };
   },
 });
@@ -236,12 +285,18 @@ export const auditTrajectory = tool({
     trialId: z.string().describe("Trial ID to audit"),
   }),
   execute: async ({ trialId }) => {
+    const trial = {
+      idx: 0,
+      reward: 0,
+      status: "failed" as const,
+      summary: `Trial ${trialId} failed`,
+    };
+    const result = await audit(trial, MOCK_MODEL);
     return {
       trialId,
-      classification: "genuine_failure",
-      rationale:
-        "The model failed to maintain cross-reference integrity across document boundaries.",
-      message: `Audited trial ${trialId}: genuine_failure.`,
+      classification: result.classification,
+      rationale: result.rationale,
+      message: `Audited trial ${trialId}: ${result.classification}.`,
     };
   },
 });
@@ -297,8 +352,8 @@ export const agentTools = {
   map_workflow_weaknesses: mapWorkflowWeaknesses,
   intake_workflow: intakeWorkflow,
   batch_probe_candidates: batchProbeCandidates,
-  run_probe_variants: runProbeVariants,
-  render_probe_decision_report: renderProbeDecisionReport,
+  run_probe_variants: runProbeVariantsT,
+  render_probe_decision_report: renderProbeDecisionReportT,
   scaffold_task: scaffoldTask,
   generate_fixtures: generateFixtures,
   lint_spoilers: lintSpoilers,
