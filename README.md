@@ -1,36 +1,115 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Harbor Eval
 
-## Getting Started
+[![CI](https://github.com/JiwaniZakir/harbor-eval/actions/workflows/ci.yml/badge.svg)](https://github.com/JiwaniZakir/harbor-eval/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/JiwaniZakir/harbor-eval/actions/workflows/codeql.yml/badge.svg)](https://github.com/JiwaniZakir/harbor-eval/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-First, run the development server:
+**Visual AI evaluation platform. Design evals that find where models fail.**
+
+Harbor Eval is a canvas-based workspace for designing and running AI model evaluation campaigns. Explore a model's weaknesses through an interactive spatial graph, guided by an AI agent that probes, discovers, and builds rigorous evaluation tasks.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|-----------|
+| Framework | Next.js 16 (App Router) |
+| Language | TypeScript (strict mode) |
+| UI | React 19, Radix UI, Tailwind CSS v4 |
+| Canvas | React Flow (@xyflow/react) |
+| State | Zustand |
+| Animation | Motion (Framer Motion) |
+| AI | Vercel AI SDK (OpenAI, Anthropic, Google) |
+| Database | PostgreSQL + Drizzle ORM |
+| Testing | Vitest + Testing Library |
+| CI/CD | GitHub Actions + Vercel |
+
+## Quick Start
 
 ```bash
+# Clone
+git clone https://github.com/JiwaniZakir/harbor-eval.git
+cd harbor-eval
+
+# Install
+npm install
+
+# Set up hooks
+npm run prepare
+
+# Configure environment
+cp .env.example .env.local
+# Edit .env.local with your API keys
+
+# Run
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run typecheck` | TypeScript type checking |
+| `npm run lint` | ESLint |
+| `npm run format` | Prettier formatting |
+| `npm run check` | All quality checks |
+| `npm run test` | Run unit tests |
+| `npm run test:watch` | Tests in watch mode |
 
-## Learn More
+## Architecture
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/                    # Next.js App Router pages & API routes
+components/
+  ui/                   # Radix-based primitive components
+  canvas/               # React Flow canvas (nodes, edges, controls)
+  layout/               # Chrome bar, sidebar, panels
+  domain/               # Domain-specific components
+  milestone/            # Milestone cards and detail views
+  companion/            # AI agent chat panel
+  studio/               # Artifacts, setup wizard, command palette
+lib/
+  types.ts              # All TypeScript type definitions
+  utils.ts              # Utility functions
+  stores/               # Zustand state stores
+  domain/               # 8 evaluation domains + milestones
+  agent/                # Agent runtime, tools, prompts
+  ai/                   # AI SDK integration, probe engine
+  db/                   # Drizzle schema and client
+  harbor/               # Harbor eval format adapters
+tests/                  # Vitest unit & integration tests
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Design System
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Warm, research-lab aesthetic with Cofounder.co-level polish:
 
-## Deploy on Vercel
+- **Background**: `#f1f1ee` (warm beige)
+- **Cards**: `#ffffff` with subtle shadows
+- **Accent**: `#7b5cf0` (purple)
+- **Font**: Figtree (Google Fonts)
+- **Light theme only**
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## CI/CD Pipeline
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **CI**: Type check, lint, format, test, build on every PR
+- **Deploy**: Auto-deploy to Vercel on main merge
+- **Security**: CodeQL analysis weekly + on PR
+- **Hooks**: Pre-commit (typecheck + lint), commit-msg (conventional commits), pre-push (build)
+
+## Contributing
+
+1. Fork and create a feature branch
+2. Follow conventional commits: `feat(scope): description`
+3. Ensure `npm run check` and `npm run test` pass
+4. Submit a PR
+
+## License
+
+MIT

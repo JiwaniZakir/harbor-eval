@@ -1,26 +1,436 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
+@theme {
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-mono: var(--font-mono), "JetBrains Mono", "Fira Code", monospace;
+}
+
+/* ─── Design Tokens (Cofounder-matched, light-only) ──────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surface hierarchy */
+  --bg: #f1f1ee;
+  --bg-warm: #edede9;
+  --bg-card: #ffffff;
+  --bg-card-secondary: #fcfcf9;
+  --bg-card-hover: #fafaf8;
+  --bg-elevated: #e8e8e5;
+  --bg-overlay: rgba(0, 0, 0, 0.5);
+  --bg-raised: #f8f8f6;
+  --bg-sidebar: #f5f5f2;
+  --bg-sidebar-inner: #fbfbf8;
+
+  /* Foreground scale (#202020 base with opacity steps) */
+  --foreground: #202020;
+  --foreground-90: rgba(32, 32, 32, 0.9);
+  --foreground-70: rgba(32, 32, 32, 0.7);
+  --foreground-60: rgba(32, 32, 32, 0.6);
+  --foreground-50: rgba(32, 32, 32, 0.5);
+  --foreground-40: rgba(32, 32, 32, 0.4);
+  --foreground-30: rgba(32, 32, 32, 0.3);
+  --foreground-20: rgba(32, 32, 32, 0.2);
+  --foreground-10: rgba(32, 32, 32, 0.1);
+  --foreground-5: rgba(32, 32, 32, 0.05);
+  --foreground-inverse: #ffffff;
+
+  /* Text aliases */
+  --text-primary: var(--foreground);
+  --text-secondary: var(--foreground-70);
+  --text-tertiary: var(--foreground-60);
+  --text-muted: var(--foreground-40);
+  --text-inverse: #f8f7f4;
+
+  /* Borders */
+  --border: rgba(0, 0, 0, 0.1);
+  --border-subtle: rgba(32, 32, 32, 0.06);
+  --border-strong: rgba(32, 32, 32, 0.15);
+  --border-focus: var(--brand-primary);
+
+  /* Brand */
+  --brand-primary: #7b5cf0;
+  --brand-primary-rgb: 123, 92, 240;
+  --brand-secondary: #c8bdf5;
+  --brand-warm: #f7ebc8;
+  --accent: var(--brand-primary);
+  --accent-hover: #6a4de0;
+  --accent-muted: rgba(123, 92, 240, 0.12);
+  --accent-glow: rgba(123, 92, 240, 0.2);
+
+  /* Domain accent colors */
+  --domain-instruction: #4087f2;
+  --domain-reasoning: #8a72e5;
+  --domain-safety: #f46746;
+  --domain-knowledge: #80a740;
+  --domain-calibration: #b16a27;
+  --domain-multilingual: #3aafa9;
+  --domain-longcontext: #e8596c;
+  --domain-tooluse: #6c63ff;
+
+  /* Status */
+  --status-success: #16a34a;
+  --status-warning: #ca8a04;
+  --status-error: #dc2626;
+  --status-info: #2563eb;
+  --status-probing: var(--brand-primary);
+  --status-locked: #9a9a9a;
+
+  /* Semantic surfaces */
+  --success-bg: hsl(143, 85%, 96%);
+  --success-border: hsl(145, 92%, 87%);
+  --success-text: hsl(140, 100%, 27%);
+  --warning-bg: hsl(49, 100%, 97%);
+  --warning-border: hsl(49, 91%, 84%);
+  --warning-text: hsl(31, 92%, 45%);
+  --error-bg: hsl(0, 93%, 97%);
+  --error-border: hsl(0, 84%, 89%);
+  --error-text: hsl(0, 72%, 51%);
+
+  /* Shadows (Cofounder-matched from Playwright extraction) */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
+  --shadow-float: 0 4px 16px rgba(0, 0, 0, 0.1), 0 1px 4px rgba(0, 0, 0, 0.05);
+  --shadow-glow: 0 0 20px rgba(var(--brand-primary-rgb), 0.15);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.04);
+
+  /* Radius scale */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* Spacing (8px base grid) */
+  --space-0: 0px;
+  --space-px: 1px;
+  --space-0-5: 2px;
+  --space-1: 4px;
+  --space-1-5: 6px;
+  --space-2: 8px;
+  --space-2-5: 10px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Transitions */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-enter: 250ms;
+  --duration-exit: 200ms;
+
+  /* Z-index scale */
+  --z-canvas: 1;
+  --z-controls: 5;
+  --z-chrome: 20;
+  --z-sidebar: 30;
+  --z-detail: 35;
+  --z-notification: 40;
+  --z-dropdown: 45;
+  --z-command: 50;
+  --z-modal: 55;
+  --z-toast: 60;
+
+  /* Layout */
+  --sidebar-width: 460px;
+  --chrome-height: 48px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── Reset & Base ───────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
+  background: var(--bg);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  line-height: 1.5;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--foreground-20);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--foreground-30);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--foreground-20) transparent;
+}
+
+/* ─── Selection ──────────────────────────────────────────────── */
+::selection {
+  background: var(--accent-muted);
+  color: var(--foreground);
+}
+
+/* ─── Focus Ring ─────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--brand-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Keyframe Animations ────────────────────────────────────── */
+@keyframes scale-in-fade {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fade-in-blur {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes fade-out-blur {
+  from {
+    opacity: 1;
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    filter: blur(4px);
+  }
+}
+
+@keyframes slide-in-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-up-fade {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-down-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 8px rgba(var(--brand-primary-rgb), 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--brand-primary-rgb), 0.4);
+  }
+}
+
+@keyframes progress-shimmer {
+  from {
+    background-position: -200% center;
+  }
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes draw-line {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ─── Animation Utility Classes ──────────────────────────────── */
+.animate-scale-in {
+  animation: scale-in-fade 300ms var(--ease-out-expo) both;
+}
+.animate-fade-blur {
+  animation: fade-in-blur 200ms var(--ease-out-expo) both;
+}
+.animate-fade-out-blur {
+  animation: fade-out-blur 200ms var(--ease-out-expo) both;
+}
+.animate-slide-right {
+  animation: slide-in-from-right 300ms var(--ease-out-expo) both;
+}
+.animate-slide-left {
+  animation: slide-in-from-left 300ms var(--ease-out-expo) both;
+}
+.animate-slide-up {
+  animation: slide-up-fade 250ms var(--ease-out-expo) both;
+}
+.animate-slide-down {
+  animation: slide-down-fade 250ms var(--ease-out-expo) both;
+}
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+.animate-shimmer {
+  animation: progress-shimmer 2s linear infinite;
+}
+.animate-spin-slow {
+  animation: spin-slow 3s linear infinite;
+}
+
+/* Stagger animation delays */
+.stagger-1 {
+  animation-delay: 50ms;
+}
+.stagger-2 {
+  animation-delay: 100ms;
+}
+.stagger-3 {
+  animation-delay: 150ms;
+}
+.stagger-4 {
+  animation-delay: 200ms;
+}
+.stagger-5 {
+  animation-delay: 250ms;
+}
+.stagger-6 {
+  animation-delay: 300ms;
+}
+.stagger-7 {
+  animation-delay: 350ms;
+}
+.stagger-8 {
+  animation-delay: 400ms;
+}
+
+/* ─── Glass Effect ───────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+
+.glass-subtle {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+/* ─── React Flow Overrides ───────────────────────────────────── */
+.react-flow__background {
+  background: var(--bg) !important;
+}
+.react-flow__controls {
+  display: none !important;
+}
+.react-flow__attribution {
+  display: none !important;
+}
+.react-flow__edge-path {
+  stroke: var(--foreground-10) !important;
+  stroke-width: 1.5 !important;
+}
+.react-flow__handle {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.react-flow__minimap {
+  border-radius: var(--radius-lg) !important;
+  border: 1px solid var(--border-subtle) !important;
+  overflow: hidden !important;
+}
+.react-flow__node {
+  cursor: pointer !important;
+}
+.react-flow__pane {
+  cursor: grab !important;
+}
+.react-flow__pane:active {
+  cursor: grabbing !important;
 }

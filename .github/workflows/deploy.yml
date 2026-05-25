@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: "1"
+
+      - name: Deploy to Vercel
+        if: ${{ env.VERCEL_TOKEN != '' }}
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: "--prod"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Post-deploy health check
+        if: ${{ env.VERCEL_TOKEN != '' }}
+        run: |
+          sleep 10
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ steps.deploy.outputs.preview-url || 'https://harboreval.com' }}/api/health")
+          if [ "$STATUS" != "200" ]; then
+            echo "Health check failed with status $STATUS"
+            exit 1
+          fi
+          echo "Health check passed"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}

@@ -1,0 +1,21 @@
+#!/bin/sh
+echo "Running pre-commit checks..."
+
+# Type check
+npx tsc --noEmit 2>&1 | tail -5
+if [ $? -ne 0 ]; then
+  echo "❌ Type check failed"
+  exit 1
+fi
+echo "✅ Types OK"
+
+# Lint staged files only
+STAGED=$(git diff --cached --name-only --diff-filter=ACM -- '*.ts' '*.tsx')
+if [ -n "$STAGED" ]; then
+  echo "$STAGED" | xargs npx eslint --quiet 2>&1 | tail -10
+  if [ $? -ne 0 ]; then
+    echo "❌ Lint failed on staged files"
+    exit 1
+  fi
+  echo "✅ Lint OK"
+fi

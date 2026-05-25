@@ -39,3 +39,24 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Drizzle
+drizzle/meta/
+
+# Test
+coverage/
+
+# OS
+.DS_Store
+Thumbs.db
