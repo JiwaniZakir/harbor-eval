@@ -6,8 +6,13 @@ import type {
   AgentEvent,
   AgentLifecycle,
   AgentPhase,
+  Artifact,
   ChatMessage,
   PlanStep,
+  ProbeSummary,
+  SweepSummary,
+  ApprovalGate,
+  WeaknessReport,
   ToolCall,
 } from "@/lib/types";
 import { generateId } from "@/lib/utils";
@@ -24,6 +29,13 @@ interface AgentStore {
   currentPlan: PlanStep[];
   toolCalls: ToolCall[];
 
+  // Pipeline results (populated by agent events)
+  artifacts: Record<string, Artifact>;
+  weaknessReport: WeaknessReport | null;
+  probeSummaries: ProbeSummary[];
+  sweepSummary: SweepSummary | null;
+  approvalGate: ApprovalGate | null;
+
   // Actions
   addUserMessage: (content: string) => void;
   addAssistantMessage: (content: string) => void;
@@ -35,6 +47,8 @@ interface AgentStore {
   setPlan: (plan: PlanStep[]) => void;
   addToolCall: (call: ToolCall) => void;
   updateToolCall: (id: string, updates: Partial<ToolCall>) => void;
+  setArtifact: (artifact: Artifact) => void;
+  resolveGate: (approved: boolean) => void;
   handleEvent: (event: AgentEvent) => void;
   clearMessages: () => void;
   reset: () => void;
@@ -54,6 +68,11 @@ export const useAgentStore = create<AgentStore>()(
       currentPhase: "intake",
       currentPlan: [],
       toolCalls: [],
+      artifacts: {},
+      weaknessReport: null,
+      probeSummaries: [],
+      sweepSummary: null,
+      approvalGate: null,
 
       addUserMessage: (content) => {
         const msg: ChatMessage = {
@@ -98,8 +117,33 @@ export const useAgentStore = create<AgentStore>()(
 
       updateToolCall: (id, updates) => {
         set((s) => ({
-          toolCalls: s.toolCalls.map((tc) => (tc.id === id ? { ...tc, ...updates } : tc)),
+          toolCalls: s.toolCalls.map((tc) =>
+            tc.id === id ? { ...tc, ...updates } : tc,
+          ),
         }));
+      },
+
+      setArtifact: (artifact) => {
+        set((s) => ({
+          artifacts: { ...s.artifacts, [artifact.path]: artifact },
+        }));
+      },
+
+      resolveGate: (approved) => {
+        if (approved) {
+          // Advance to next phase when gate is approved
+          const nextPhaseMap: Partial<Record<AgentPhase, AgentPhase>> = {
+            weakness: "probe",
+            decision: "scaffold",
+            verifier: "sweep",
+            audit: "iteration",
+            iteration: "publish",
+          };
+          const { currentPhase } = get();
+          const next = nextPhaseMap[currentPhase];
+          if (next) set({ currentPhase: next });
+        }
+        set({ approvalGate: null });
       },
 
       handleEvent: (event) => {
@@ -113,6 +157,9 @@ export const useAgentStore = create<AgentStore>()(
             break;
           case "phase":
             store.setPhase(event.phase);
+            store.setLifecycle(
+              event.phase === "publish" ? "complete" : "probing",
+            );
             break;
           case "tool_call_start":
             store.addToolCall(event.call);
@@ -124,6 +171,32 @@ export const useAgentStore = create<AgentStore>()(
               finishedAt: Date.now(),
             });
             break;
+          case "artifact":
+            store.setArtifact(event.artifact);
+            break;
+          case "weakness_report":
+            set({ weaknessReport: event.report });
+            break;
+          case "probe_summary":
+            set((s) => ({
+              probeSummaries: [...s.probeSummaries, event.summary],
+            }));
+            break;
+          case "probe_batch_summary":
+            set((s) => ({
+              probeSummaries: [...s.probeSummaries, ...event.summaries],
+            }));
+            break;
+          case "sweep_update":
+            set({ sweepSummary: event.summary });
+            break;
+          case "approval_gate":
+            set({ approvalGate: event.gate });
+            store.setLifecycle("awaiting_approval");
+            break;
+          case "notice":
+            // Notices are shown as toasts by the UI layer
+            break;
           case "done":
             store.finalizeStream();
             store.setLifecycle("complete");
@@ -132,12 +205,19 @@ export const useAgentStore = create<AgentStore>()(
             store.finalizeStream();
             store.setLifecycle("error");
             break;
-          default:
-            break;
         }
       },
 
-      clearMessages: () => set({ messages: [], toolCalls: [], currentPlan: [] }),
+      clearMessages: () =>
+        set({
+          messages: [],
+          toolCalls: [],
+          currentPlan: [],
+          probeSummaries: [],
+          weaknessReport: null,
+          sweepSummary: null,
+          approvalGate: null,
+        }),
 
       reset: () =>
         set({
@@ -148,6 +228,11 @@ export const useAgentStore = create<AgentStore>()(
           currentPhase: "intake",
           currentPlan: [],
           toolCalls: [],
+          artifacts: {},
+          weaknessReport: null,
+          probeSummaries: [],
+          sweepSummary: null,
+          approvalGate: null,
         }),
 
       sendMessage: async (content) => {
@@ -171,7 +256,6 @@ export const useAgentStore = create<AgentStore>()(
             throw new Error(err || `Agent API error: ${res.status}`);
           }
 
-          // Read SSE stream
           const reader = res.body?.getReader();
           if (!reader) throw new Error("No response body");
 
@@ -200,12 +284,12 @@ export const useAgentStore = create<AgentStore>()(
             }
           }
 
-          // Ensure stream finalized
           if (get().isStreaming) {
             get().finalizeStream();
           }
         } catch (error) {
-          const message = error instanceof Error ? error.message : "Unknown error";
+          const message =
+            error instanceof Error ? error.message : "Unknown error";
           get().handleEvent({ type: "error", message });
         }
       },

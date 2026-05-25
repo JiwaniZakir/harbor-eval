@@ -4,10 +4,23 @@ import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { useProjectStore } from "@/lib/stores/project-store";
 import { useDomainStore } from "@/lib/stores/domain-store";
+import { useAgentStore } from "@/lib/stores/agent-store";
 import { DOMAINS } from "@/lib/domain/domains";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Home, Bot, Layers, ClipboardList, Library, Sparkles, ArrowRight } from "lucide-react";
+import { WeaknessCardView } from "@/components/pipeline/weakness-card";
+import { SweepProgress } from "@/components/pipeline/sweep-progress";
+import { ApprovalGateView } from "@/components/pipeline/approval-gate";
+import { ArtifactViewer } from "@/components/pipeline/artifact-viewer";
+import {
+  Home,
+  Bot,
+  Layers,
+  ClipboardList,
+  Library,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 import type { SidebarTab, DomainId } from "@/lib/types";
 import { AgentChat } from "@/components/companion/agent-chat";
 
@@ -50,8 +63,13 @@ function HomeContent() {
   const suggestedProbes = useDomainStore((s) => s.suggestedProbes);
   const openDetailPanel = useUIStore((s) => s.openDetailPanel);
   const setFocusedDomain = useUIStore((s) => s.setFocusedDomain);
-
   const globalProgress = useDomainStore((s) => s.getGlobalProgress());
+
+  // Pipeline state from agent
+  const weaknessReport = useAgentStore((s) => s.weaknessReport);
+  const sweepSummary = useAgentStore((s) => s.sweepSummary);
+  const approvalGate = useAgentStore((s) => s.approvalGate);
+  const resolveGate = useAgentStore((s) => s.resolveGate);
 
   const handleDomainClick = (domainId: DomainId) => {
     setFocusedDomain(domainId);
@@ -71,16 +89,53 @@ function HomeContent() {
               : "evening"}
         </h2>
         <p className="text-xs text-[var(--text-muted)]">
-          {project ? `Working on ${project.name}` : "Create a campaign to get started"}
+          {project
+            ? `Working on ${project.name}`
+            : "Create a campaign to get started"}
         </p>
       </div>
+
+      {/* Approval gate (top priority) */}
+      {approvalGate && (
+        <ApprovalGateView
+          gate={approvalGate}
+          onApprove={() => resolveGate(true)}
+          onReject={() => resolveGate(false)}
+        />
+      )}
+
+      {/* Sweep results */}
+      {sweepSummary && <SweepProgress sweep={sweepSummary} />}
+
+      {/* Weakness report cards */}
+      {weaknessReport &&
+        weaknessReport.candidates.length > 0 && (
+          <div>
+            <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+              Weakness Candidates
+            </h3>
+            <div className="flex flex-col gap-1.5">
+              {weaknessReport.candidates.slice(0, 3).map((c) => (
+                <WeaknessCardView
+                  key={c.slug}
+                  weakness={c}
+                  onClick={() => {}}
+                />
+              ))}
+            </div>
+          </div>
+        )}
 
       {/* Roadmap card */}
       {project && (
         <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-medium text-[var(--foreground)]">{project.name}</span>
-            <span className="text-[11px] text-[var(--text-muted)]">{globalProgress}%</span>
+            <span className="text-xs font-medium text-[var(--foreground)]">
+              {project.name}
+            </span>
+            <span className="text-[11px] text-[var(--text-muted)]">
+              {globalProgress}%
+            </span>
           </div>
           <Progress value={globalProgress} className="h-1" />
         </div>
@@ -93,7 +148,9 @@ function HomeContent() {
             Domains
           </h3>
           <div className="flex flex-col gap-1">
-            {DOMAINS.filter((d) => domainStates[d.id]?.status !== "locked").map((domain) => {
+            {DOMAINS.filter(
+              (d) => domainStates[d.id]?.status !== "locked",
+            ).map((domain) => {
               const state = domainStates[domain.id];
               return (
                 <button
@@ -146,7 +203,10 @@ function HomeContent() {
                 onClick={() => handleDomainClick(probe.domainId)}
                 className="group flex items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-2 text-left transition-colors hover:bg-[var(--foreground-5)]"
               >
-                <Sparkles size={12} className="shrink-0 text-[var(--brand-primary)]" />
+                <Sparkles
+                  size={12}
+                  className="shrink-0 text-[var(--brand-primary)]"
+                />
                 <span className="flex-1 truncate text-xs text-[var(--foreground-60)]">
                   {probe.label}
                 </span>
@@ -187,17 +247,23 @@ function DomainsContent() {
             className={cn(
               "flex items-start gap-3 rounded-[var(--radius-md)] p-3 text-left transition-colors",
               isLocked
-                ? "opacity-40 cursor-not-allowed"
-                : "hover:bg-[var(--foreground-5)] cursor-pointer",
+                ? "cursor-not-allowed opacity-40"
+                : "cursor-pointer hover:bg-[var(--foreground-5)]",
             )}
           >
             <div
-              className="mt-0.5 h-3 w-3 rounded-full shrink-0"
-              style={{ backgroundColor: isLocked ? "var(--status-locked)" : domain.accent }}
+              className="mt-0.5 h-3 w-3 shrink-0 rounded-full"
+              style={{
+                backgroundColor: isLocked
+                  ? "var(--status-locked)"
+                  : domain.accent,
+              }}
             />
-            <div className="flex-1 min-w-0">
-              <div className="text-sm font-medium text-[var(--foreground)]">{domain.label}</div>
-              <div className="mt-0.5 text-xs text-[var(--text-muted)] line-clamp-2">
+            <div className="min-w-0 flex-1">
+              <div className="text-sm font-medium text-[var(--foreground)]">
+                {domain.label}
+              </div>
+              <div className="mt-0.5 line-clamp-2 text-xs text-[var(--text-muted)]">
                 {domain.description}
               </div>
               {!isLocked && state && (
@@ -239,8 +305,16 @@ function TasksContent() {
         ...(grouped.in_progress || []),
       ],
     },
-    { key: "available", label: "Available", items: grouped.available || [] },
-    { key: "completed", label: "Completed", items: grouped.completed || [] },
+    {
+      key: "available",
+      label: "Available",
+      items: grouped.available || [],
+    },
+    {
+      key: "completed",
+      label: "Completed",
+      items: grouped.completed || [],
+    },
     { key: "locked", label: "Locked", items: grouped.locked || [] },
   ].filter((s) => s.items.length > 0);
 
@@ -262,7 +336,10 @@ function TasksContent() {
                   key={m.id}
                   onClick={() => {
                     setFocusedDomain(m.domainId);
-                    openDetailPanel({ kind: "domain", domainId: m.domainId });
+                    openDetailPanel({
+                      kind: "domain",
+                      domainId: m.domainId,
+                    });
                   }}
                   className="flex items-center gap-2.5 rounded-[var(--radius-md)] px-2 py-1.5 text-left transition-colors hover:bg-[var(--foreground-5)]"
                 >
@@ -273,7 +350,9 @@ function TasksContent() {
                   <span className="flex-1 truncate text-xs text-[var(--foreground-70)]">
                     {m.label}
                   </span>
-                  <span className="text-[10px] text-[var(--text-muted)]">{domain?.shortLabel}</span>
+                  <span className="text-[10px] text-[var(--text-muted)]">
+                    {domain?.shortLabel}
+                  </span>
                 </button>
               );
             })}
@@ -284,12 +363,32 @@ function TasksContent() {
   );
 }
 
-function PlaceholderContent({ label }: { label: string }) {
+function LibraryContent() {
+  const artifacts = useAgentStore((s) => s.artifacts);
+  const artifactList = Object.values(artifacts);
+
+  if (artifactList.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <Library
+          size={24}
+          className="mb-2 text-[var(--foreground-20)]"
+        />
+        <div className="text-sm text-[var(--text-muted)]">
+          Artifact Library
+        </div>
+        <div className="mt-1 text-xs text-[var(--foreground-30)]">
+          Artifacts will appear here as the agent creates them.
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="text-sm text-[var(--text-muted)]">{label}</div>
-      <div className="mt-1 text-xs text-[var(--foreground-30)]">Coming soon</div>
-    </div>
+    <ArtifactViewer
+      artifacts={artifactList}
+      className="h-[calc(100vh-200px)]"
+    />
   );
 }
 
@@ -298,16 +397,13 @@ export function Sidebar() {
 
   return (
     <div className="flex flex-col gap-3">
-      {/* Tab bar */}
       <TabBar />
-
-      {/* Content */}
       <div className="animate-fade-blur">
         {activeTab === "home" && <HomeContent />}
         {activeTab === "agent" && <AgentChat />}
         {activeTab === "domains" && <DomainsContent />}
         {activeTab === "tasks" && <TasksContent />}
-        {activeTab === "library" && <PlaceholderContent label="Artifact Library" />}
+        {activeTab === "library" && <LibraryContent />}
       </div>
     </div>
   );

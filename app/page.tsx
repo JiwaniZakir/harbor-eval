@@ -10,6 +10,8 @@ import { SetupWizard } from "@/components/studio/setup-wizard";
 import { CommandPalette } from "@/components/studio/command-palette";
 import { SettingsPanel } from "@/components/studio/settings-panel";
 import { ToastContainer } from "@/components/ui/toast";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
+import { HydrationGuard } from "@/components/ui/hydration-guard";
 import { DomainDetailPanel } from "@/components/domain/domain-detail-panel";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { useProjectStore } from "@/lib/stores/project-store";
@@ -85,36 +87,40 @@ export default function WorkspacePage() {
   }, []);
 
   return (
-    <ReactFlowProvider>
-      <div className="flex h-screen flex-col bg-[var(--bg)]">
-        {/* Floating chrome bar */}
-        <ChromeBar />
+    <HydrationGuard>
+      <ErrorBoundary>
+        <ReactFlowProvider>
+          <div className="flex h-screen flex-col bg-[var(--bg)]">
+            {/* Floating chrome bar */}
+            <ChromeBar />
 
-        {/* Main content area */}
-        <div className="flex min-h-0 flex-1">
-          {/* Canvas (full viewport) */}
-          <div className="relative flex-1">{project ? <CanvasShell /> : <EmptyCanvas />}</div>
+            {/* Main content area */}
+            <div className="flex min-h-0 flex-1">
+              {/* Canvas (full viewport) */}
+              <div className="relative flex-1">{project ? <CanvasShell /> : <EmptyCanvas />}</div>
 
-          {/* Floating sidebar */}
-          {project && (
-            <div className="z-[var(--z-sidebar)] flex h-full w-[var(--sidebar-width)] shrink-0 flex-col my-2 mr-2">
-              <div className="flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--bg-sidebar)] shadow-[var(--shadow-md)]">
-                {/* Inner content */}
-                <div className="flex-1 overflow-y-auto rounded-[10px] bg-[var(--bg-sidebar-inner)] m-1.5 p-3">
-                  {detailPanelOpen && focusedDomainId ? <DomainDetailPanel /> : <SidebarContent />}
+              {/* Floating sidebar */}
+              {project && (
+                <div className="z-[var(--z-sidebar)] flex h-full w-[var(--sidebar-width)] shrink-0 flex-col my-2 mr-2">
+                  <div className="flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--bg-sidebar)] shadow-[var(--shadow-md)]">
+                    {/* Inner content */}
+                    <div className="flex-1 overflow-y-auto rounded-[10px] bg-[var(--bg-sidebar-inner)] m-1.5 p-3">
+                      {detailPanelOpen && focusedDomainId ? <DomainDetailPanel /> : <SidebarContent />}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Overlays */}
-        <SetupWizard />
-        <CommandPalette />
-        <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-        <ToastContainer />
-      </div>
-    </ReactFlowProvider>
+            {/* Overlays */}
+            <SetupWizard />
+            <CommandPalette />
+            <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
+            <ToastContainer />
+          </div>
+        </ReactFlowProvider>
+      </ErrorBoundary>
+    </HydrationGuard>
   );
 }
 
