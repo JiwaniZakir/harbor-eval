@@ -17,19 +17,8 @@ import {
   Loader2,
 } from "lucide-react";
 import type { ChatMessage, ToolCall, PlanStep } from "@/lib/types";
-import { generateId, formatRelativeTime } from "@/lib/utils";
-
-// Demo messages for initial state
-const DEMO_MESSAGES: ChatMessage[] = [
-  {
-    id: "welcome-1",
-    role: "assistant",
-    content:
-      'I\'ve set up your evaluation canvas. I can see your domains are ready for probing. Click "Start Probing" on any milestone, or ask me to suggest where to begin.',
-    createdAt: Date.now() - 60000,
-    phase: "intake",
-  },
-];
+import { formatRelativeTime } from "@/lib/utils";
+import { useAgentStore } from "@/lib/stores/agent-store";
 
 function ToolCallCard({ toolCall }: { toolCall: ToolCall }) {
   const [expanded, setExpanded] = useState(false);
@@ -45,7 +34,7 @@ function ToolCallCard({ toolCall }: { toolCall: ToolCall }) {
     <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-card-secondary)] text-xs">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center gap-2 px-2.5 py-1.5 text-left hover:bg-[var(--foreground-5)] transition-colors rounded-[var(--radius-md)]"
+        className="flex w-full items-center gap-2 rounded-[var(--radius-md)] px-2.5 py-1.5 text-left transition-colors hover:bg-[var(--foreground-5)]"
       >
         {statusIcon}
         <span className="flex-1 font-mono text-[var(--text-secondary)]">{toolCall.name}</span>
@@ -58,12 +47,12 @@ function ToolCallCard({ toolCall }: { toolCall: ToolCall }) {
       </button>
       {expanded && (
         <div className="border-t border-[var(--border-subtle)] px-2.5 py-2">
-          <pre className="max-h-[120px] overflow-auto text-[10px] text-[var(--text-muted)] font-mono whitespace-pre-wrap">
+          <pre className="max-h-[120px] overflow-auto whitespace-pre-wrap font-mono text-[10px] text-[var(--text-muted)]">
             {toolCall.summary || JSON.stringify(toolCall.args, null, 2)}
           </pre>
           {toolCall.result != null && (
             <div className="mt-1.5 border-t border-[var(--border-subtle)] pt-1.5">
-              <pre className="max-h-[80px] overflow-auto text-[10px] text-[var(--text-muted)] font-mono whitespace-pre-wrap">
+              <pre className="max-h-[80px] overflow-auto whitespace-pre-wrap font-mono text-[10px] text-[var(--text-muted)]">
                 {typeof toolCall.result === "string"
                   ? toolCall.result
                   : JSON.stringify(toolCall.result, null, 2)}
@@ -83,7 +72,7 @@ function PlanDisplay({ steps }: { steps: PlanStep[] }) {
         <div key={step.id} className="flex items-center gap-1">
           <div
             className={cn(
-              "flex h-4 items-center rounded-full px-2 text-[9px] font-medium whitespace-nowrap",
+              "flex h-4 items-center whitespace-nowrap rounded-full px-2 text-[9px] font-medium",
               step.status === "done"
                 ? "bg-[var(--success-bg)] text-[var(--success-text)]"
                 : step.status === "active"
@@ -137,7 +126,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
             "rounded-[var(--radius-lg)] px-3 py-2 text-sm leading-relaxed",
             isUser
               ? "bg-[var(--foreground)] text-[var(--foreground-inverse)]"
-              : "bg-[var(--bg-card)] text-[var(--foreground)] shadow-[var(--shadow-sm)] border border-[var(--border-subtle)]",
+              : "border border-[var(--border-subtle)] bg-[var(--bg-card)] text-[var(--foreground)] shadow-[var(--shadow-sm)]",
           )}
         >
           {message.content}
@@ -161,73 +150,81 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   );
 }
 
+/** Streaming text bubble -- shows text as it arrives */
+function StreamingBubble({ text }: { text: string }) {
+  if (!text) return null;
+  return (
+    <div className="flex gap-2.5">
+      <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-muted)]">
+        <Bot size={12} className="text-[var(--brand-primary)]" />
+      </div>
+      <div className="flex max-w-[85%] flex-col gap-1.5">
+        <div className="rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-3 py-2 text-sm leading-relaxed text-[var(--foreground)] shadow-[var(--shadow-sm)]">
+          {text}
+          <span className="ml-0.5 inline-block h-3.5 w-0.5 animate-pulse bg-[var(--brand-primary)]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function AgentChat() {
-  const [messages, setMessages] = useState<ChatMessage[]>(DEMO_MESSAGES);
+  const { messages, isStreaming, currentStreamText, currentPlan, sendMessage } = useAgentStore();
+
   const [input, setInput] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom on new messages
+  // Auto-scroll to bottom on new messages or stream updates
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, currentStreamText]);
 
   const handleSend = () => {
-    if (!input.trim() || isLoading) return;
-
-    const userMessage: ChatMessage = {
-      id: generateId(),
-      role: "user",
-      content: input.trim(),
-      createdAt: Date.now(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    if (!input.trim() || isStreaming) return;
+    const msg = input.trim();
     setInput("");
-    setIsLoading(true);
-
-    // Simulate agent response
-    setTimeout(() => {
-      const assistantMessage: ChatMessage = {
-        id: generateId(),
-        role: "assistant",
-        content:
-          "I'll analyze that domain and suggest the best probing strategy. Let me examine the milestones and identify potential failure modes...",
-        createdAt: Date.now(),
-        phase: "weakness",
-        toolCalls: [
-          {
-            id: generateId(),
-            name: "map_workflow_weaknesses",
-            args: { domain: "instruction_following" },
-            status: "succeeded",
-            startedAt: Date.now() - 2300,
-            finishedAt: Date.now(),
-            summary: "Found 3 weakness candidates with fit scores 8.2, 6.1, 5.4",
-          },
-        ],
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
-      setIsLoading(false);
-    }, 1500);
+    sendMessage(msg);
   };
+
+  const hasMessages = messages.length > 0;
 
   return (
     <div className="flex h-full flex-col">
       {/* Messages */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-4 pb-4">
+      <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto pb-4">
+        {!hasMessages && !isStreaming && (
+          <div className="flex flex-col items-center justify-center gap-2 py-12 text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--accent-muted)]">
+              <Bot size={20} className="text-[var(--brand-primary)]" />
+            </div>
+            <p className="text-sm text-[var(--text-secondary)]">
+              Ask me anything about your evaluation campaign.
+            </p>
+            <p className="text-xs text-[var(--text-muted)]">
+              I can map weaknesses, run probes, scaffold tasks, and more.
+            </p>
+          </div>
+        )}
+
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} />
         ))}
 
-        {isLoading && (
+        {/* Active plan display */}
+        {currentPlan.length > 0 && isStreaming && <PlanDisplay steps={currentPlan} />}
+
+        {/* Streaming text */}
+        {isStreaming && currentStreamText && <StreamingBubble text={currentStreamText} />}
+
+        {/* Typing indicator */}
+        {isStreaming && !currentStreamText && (
           <div className="flex items-center gap-2.5">
             <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--accent-muted)]">
               <Bot size={12} className="text-[var(--brand-primary)]" />
             </div>
-            <div className="flex items-center gap-2 rounded-[var(--radius-lg)] bg-[var(--bg-card)] px-3 py-2 shadow-[var(--shadow-sm)] border border-[var(--border-subtle)]">
+            <div className="flex items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-3 py-2 shadow-[var(--shadow-sm)]">
               <Spinner size={14} />
               <span className="text-xs text-[var(--text-muted)]">Thinking...</span>
             </div>
@@ -255,7 +252,7 @@ export function AgentChat() {
             variant="primary"
             size="icon"
             onClick={handleSend}
-            disabled={!input.trim() || isLoading}
+            disabled={!input.trim() || isStreaming}
           >
             <Send size={14} />
           </Button>

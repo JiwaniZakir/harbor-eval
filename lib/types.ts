@@ -250,3 +250,158 @@ export interface CanvasConfig {
   center: { x: number; y: number };
   selectedNodeId: string | null;
 }
+
+// ─── Agent Run Types ─────────────────────────────────────────────────────────
+
+export type AgentLifecycle =
+  | "idle"
+  | "initializing"
+  | "probing"
+  | "analyzing"
+  | "building"
+  | "validating"
+  | "awaiting_approval"
+  | "complete"
+  | "error";
+
+export interface AgentRun {
+  id: string;
+  projectId: string;
+  domainId: DomainId;
+  milestoneId: string;
+  lifecycle: AgentLifecycle;
+  messages: ChatMessage[];
+  currentPlan: PlanStep[];
+  toolCalls: ToolCall[];
+  startedAt: number;
+  finishedAt?: number;
+  error?: string;
+}
+
+// ─── Approval Gate ───────────────────────────────────────────────────────────
+
+export interface ApprovalGate {
+  gateId: string;
+  title: string;
+  description: string;
+  stage: string;
+  candidateCount?: number;
+  promoteCount?: number;
+  taskSlug?: string;
+}
+
+// ─── Agent Events ────────────────────────────────────────────────────────────
+
+export type AgentEvent =
+  | { type: "phase"; phase: AgentPhase }
+  | { type: "plan"; plan: PlanStep[] }
+  | { type: "text"; delta: string }
+  | { type: "tool_call_start"; call: ToolCall }
+  | {
+      type: "tool_call_finish";
+      id: string;
+      result: unknown;
+      summary?: string;
+      status?: ToolCallStatus;
+    }
+  | { type: "artifact"; artifact: Artifact }
+  | { type: "probe_summary"; summary: ProbeSummary }
+  | { type: "probe_batch_summary"; summaries: ProbeSummary[] }
+  | { type: "weakness_report"; report: WeaknessReport }
+  | { type: "sweep_update"; summary: SweepSummary }
+  | { type: "approval_gate"; gate: ApprovalGate }
+  | { type: "notice"; notice: Notice }
+  | { type: "done"; summary: string }
+  | { type: "error"; message: string };
+
+// ─── Weakness & Probe Types ─────────────────────────────────────────────────
+
+export interface WeaknessReport {
+  workflowDescription: string;
+  candidates: WeaknessCandidate[];
+  createdAt: number;
+}
+
+export interface ProbeSummary {
+  weaknessTitle: string;
+  variants: Array<{
+    variant: string;
+    failureRate: number;
+    trials: number;
+    failures: number;
+  }>;
+  verdict: "promote" | "redesign" | "reject";
+}
+
+// ─── Sweep & Audit Types ────────────────────────────────────────────────────
+
+export interface SweepTrial {
+  idx: number;
+  reward: number;
+  status: "queued" | "running" | "passed" | "failed";
+  summary: string;
+}
+
+export interface SweepSummary {
+  taskSlug: string;
+  passAt3: string;
+  trials: SweepTrial[];
+  cascade?: Array<{ id: string; label: string; status: string }>;
+}
+
+export interface SpoilerFinding {
+  artifactPath: string;
+  line: number;
+  severity: "low" | "medium" | "high";
+  ruleId: string;
+  message: string;
+}
+
+export interface AuditSummary {
+  auditorModel: string;
+  classification: string;
+  rationale: string;
+  steps?: Array<{
+    id: string;
+    label: string;
+    kind: "model" | "tool" | "verifier" | "notice";
+    excerpt?: string;
+    reward?: number;
+    failed?: boolean;
+  }>;
+}
+
+export interface DecisionReportEntry {
+  slug: string;
+  weaknessTitle: string;
+  verdict: ProbeSummary["verdict"];
+  aggregateFailureRate: number;
+  recommendedAction: string;
+}
+
+// ─── Eval Task ───────────────────────────────────────────────────────────────
+
+export interface EvalTask {
+  id: string;
+  projectId: string;
+  domainId: DomainId;
+  milestoneId: string;
+  slug: string;
+  title: string;
+  phase: TaskPhase;
+  weaknessCard: WeaknessCard | null;
+  probeSummary: ProbeSummary | null;
+  sweepSummary: SweepSummary | null;
+  artifacts: Artifact[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+// ─── Notice ──────────────────────────────────────────────────────────────────
+
+export interface Notice {
+  id: string;
+  level: "info" | "warning" | "error" | "success";
+  message: string;
+  createdAt: number;
+}
