@@ -41,6 +41,7 @@ export function SetupWizard() {
   const refreshSuggested = useDomainStore((s) => s.refreshSuggestedProbes);
 
   const [step, setStep] = useState(0);
+  const [launching, setLaunching] = useState(false);
   const [name, setName] = useState("");
   const [provider, setProvider] = useState<Provider>("openai");
   const [model, setModel] = useState("gpt-4o");
@@ -60,14 +61,19 @@ export function SetupWizard() {
   const steps = ["Name", "Model", "Domains", "Launch"];
 
   const handleLaunch = () => {
-    const config: TargetModelConfig = { provider, model };
-    initProject(name, config);
-    initDomains(selectedDomains);
-    refreshSuggested();
-    setOpen(false);
-    // Reset wizard
-    setStep(0);
-    setName("");
+    setLaunching(true);
+    // Brief delay so user sees the launching state
+    setTimeout(() => {
+      const config: TargetModelConfig = { provider, model };
+      initProject(name, config);
+      initDomains(selectedDomains);
+      refreshSuggested();
+      setOpen(false);
+      // Reset wizard
+      setStep(0);
+      setLaunching(false);
+      setName("");
+    }, 400);
   };
 
   const toggleDomain = (id: DomainId) => {
@@ -81,6 +87,10 @@ export function SetupWizard() {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[var(--z-modal)] bg-[var(--bg-overlay)] animate-fade-blur" />
         <Dialog.Content className="fixed left-1/2 top-1/2 z-[var(--z-modal)] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 animate-scale-in">
+          <Dialog.Title className="sr-only">Create Evaluation Campaign</Dialog.Title>
+          <Dialog.Description className="sr-only">
+            Step-by-step wizard to set up a new AI evaluation campaign.
+          </Dialog.Description>
           <div className="rounded-[var(--radius-xl)] border border-[var(--border-subtle)] bg-[var(--bg-card)] shadow-[var(--shadow-xl)]">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-[var(--border-subtle)] px-6 py-4">
@@ -303,9 +313,18 @@ export function SetupWizard() {
                   <ArrowRight size={14} />
                 </Button>
               ) : (
-                <Button variant="primary" size="sm" onClick={handleLaunch}>
-                  <Rocket size={14} />
-                  Launch Campaign
+                <Button variant="primary" size="sm" onClick={handleLaunch} disabled={launching}>
+                  {launching ? (
+                    <>
+                      <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                      Launching...
+                    </>
+                  ) : (
+                    <>
+                      <Rocket size={14} />
+                      Launch Campaign
+                    </>
+                  )}
                 </Button>
               )}
             </div>
