@@ -12,6 +12,7 @@ import { WeaknessCardView } from "@/components/pipeline/weakness-card";
 import { SweepProgress } from "@/components/pipeline/sweep-progress";
 import { ApprovalGateView } from "@/components/pipeline/approval-gate";
 import { ArtifactViewer } from "@/components/pipeline/artifact-viewer";
+import { ExportPanel } from "@/components/studio/export-panel";
 import {
   Home,
   Bot,
@@ -385,10 +386,13 @@ function LibraryContent() {
   }
 
   return (
-    <ArtifactViewer
-      artifacts={artifactList}
-      className="h-[calc(100vh-200px)]"
-    />
+    <div className="flex flex-col gap-4">
+      <ExportPanel />
+      <ArtifactViewer
+        artifacts={artifactList}
+        className="h-[calc(100vh-400px)]"
+      />
+    </div>
   );
 }
 
