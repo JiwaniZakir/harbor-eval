@@ -2,7 +2,18 @@ import { describe, it, expect } from "vitest";
 import { systemPrompt } from "@/lib/agent/system-prompt";
 import { stageForPhase, stageContexts, productStages } from "@/lib/agent/stages";
 import { buildEmptyWorkspace } from "@/lib/agent/seed-workspace";
-import { agentTools } from "@/lib/agent/tools";
+import { createAgentTools, type ToolContext } from "@/lib/agent/tools";
+import type { AgentEvent, Artifact } from "@/lib/types";
+
+/** Create a test tool context with an empty workspace and a no-op event handler. */
+function testContext(): ToolContext & { events: AgentEvent[] } {
+  const events: AgentEvent[] = [];
+  return {
+    workspace: new Map<string, Artifact>(),
+    onEvent: (e: AgentEvent) => events.push(e),
+    events,
+  };
+}
 
 describe("system-prompt", () => {
   it("returns base prompt without workspace", () => {
@@ -99,56 +110,135 @@ describe("seed-workspace", () => {
 
 describe("agent tools", () => {
   it("exports all 15 tools", () => {
-    expect(Object.keys(agentTools)).toHaveLength(15);
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    expect(Object.keys(tools)).toHaveLength(15);
   });
 
   it("each tool has description and execute", () => {
-    for (const [name, t] of Object.entries(agentTools)) {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    for (const [name, t] of Object.entries(tools)) {
       expect(t.description, `${name} should have description`).toBeTruthy();
       expect(t.execute, `${name} should have execute`).toBeDefined();
     }
   });
 
-  it("list_workspace returns empty artifacts", async () => {
-    const result = (await agentTools.list_workspace.execute!(
+  it("list_workspace returns empty artifacts initially", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    const result = (await tools.list_workspace.execute!(
       {},
-      {
-        toolCallId: "test",
-        messages: [],
-      },
+      { toolCallId: "test", messages: [] },
     )) as { artifacts: string[] };
     expect(result.artifacts).toEqual([]);
   });
 
-  it("write_artifact returns byte count", async () => {
-    const result = (await agentTools.write_artifact.execute!(
+  it("write_artifact stores in workspace and emits event", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    const result = (await tools.write_artifact.execute!(
       { path: "test.md", content: "hello" },
       { toolCallId: "test", messages: [] },
     )) as { bytes: number };
     expect(result.bytes).toBe(5);
+    expect(ctx.workspace.has("test.md")).toBe(true);
+    expect(ctx.workspace.get("test.md")!.content).toBe("hello");
+    expect(ctx.events.some((e) => e.type === "artifact")).toBe(true);
   });
 
-  it("map_workflow_weaknesses returns candidates", async () => {
-    const result = (await agentTools.map_workflow_weaknesses.execute!(
+  it("read_artifact reads from workspace", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    // Write first
+    await tools.write_artifact.execute!(
+      { path: "data.json", content: '{"a":1}' },
+      { toolCallId: "w", messages: [] },
+    );
+    // Read back
+    const result = (await tools.read_artifact.execute!(
+      { path: "data.json" },
+      { toolCallId: "r", messages: [] },
+    )) as { content: string };
+    expect(result.content).toBe('{"a":1}');
+  });
+
+  it("read_artifact returns null for missing path", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    const result = (await tools.read_artifact.execute!(
+      { path: "nope.txt" },
+      { toolCallId: "r", messages: [] },
+    )) as { content: string | null };
+    expect(result.content).toBeNull();
+  });
+
+  it("list_workspace shows written artifacts", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    await tools.write_artifact.execute!(
+      { path: "a.md", content: "aaa" },
+      { toolCallId: "w1", messages: [] },
+    );
+    await tools.write_artifact.execute!(
+      { path: "b.py", content: "bbb" },
+      { toolCallId: "w2", messages: [] },
+    );
+    const result = (await tools.list_workspace.execute!(
+      {},
+      { toolCallId: "l", messages: [] },
+    )) as { artifacts: string[] };
+    expect(result.artifacts).toContain("a.md");
+    expect(result.artifacts).toContain("b.py");
+  });
+
+  it("map_workflow_weaknesses returns candidates and emits event", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    const result = (await tools.map_workflow_weaknesses.execute!(
       { workflowDescription: "A compliance workflow" },
       { toolCallId: "test", messages: [] },
     )) as { candidates: unknown[] };
     expect(result.candidates.length).toBeGreaterThan(0);
+    expect(ctx.events.some((e) => e.type === "weakness_report")).toBe(true);
   });
 
-  it("run_harbor_sweep returns pass@3", async () => {
-    const result = (await agentTools.run_harbor_sweep.execute!(
+  it("run_harbor_sweep returns pass@3 and emits event", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    const result = (await tools.run_harbor_sweep.execute!(
       { mode: "target", trials: 3 },
       { toolCallId: "test", messages: [] },
     )) as { passAt3: string };
     expect(result.passAt3).toBe("0.27");
+    expect(ctx.events.some((e) => e.type === "sweep_update")).toBe(true);
   });
 
-  it("set_phase returns the phase", async () => {
-    const result = (await agentTools.set_phase.execute!(
+  it("set_phase returns the phase and emits events", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    const result = (await tools.set_phase.execute!(
       { phase: "probe" },
       { toolCallId: "test", messages: [] },
     )) as { phase: string };
     expect(result.phase).toBe("probe");
+    expect(ctx.events.some((e) => e.type === "phase")).toBe(true);
+    expect(ctx.events.some((e) => e.type === "notice")).toBe(true);
+  });
+
+  it("scaffold_task emits artifact events for generated files", async () => {
+    const ctx = testContext();
+    const tools = createAgentTools(ctx);
+    const result = (await tools.scaffold_task.execute!(
+      { weaknessSlug: "test-weakness", taskTitle: "Test Task" },
+      { toolCallId: "test", messages: [] },
+    )) as { files: string[] };
+    expect(result.files.length).toBeGreaterThan(0);
+    const artifactEvents = ctx.events.filter((e) => e.type === "artifact");
+    expect(artifactEvents.length).toBe(result.files.length);
+    // Artifacts should be in workspace
+    for (const f of result.files) {
+      expect(ctx.workspace.has(f)).toBe(true);
+    }
   });
 });

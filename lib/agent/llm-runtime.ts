@@ -1,9 +1,9 @@
 import { streamText, stepCountIs } from "ai";
 import { getAiModel, type LlmProvider } from "@/lib/ai/providers";
-import { agentTools } from "./tools";
+import { createAgentTools } from "./tools";
 import { systemPrompt } from "./system-prompt";
 import { stageForPhase, stageContexts } from "./stages";
-import type { AgentEvent, ChatMessage, PlanStep, ToolCall, WorkspaceState } from "./types";
+import type { AgentEvent, ChatMessage, PlanStep, ToolCall, WorkspaceState, Artifact } from "./types";
 import { generateId } from "@/lib/utils";
 
 export const DEFAULT_TRIALS_PER_VARIANT = 15;
@@ -27,6 +27,15 @@ export async function runLlmAgent(opts: LlmAgentOptions): Promise<string> {
   const { input, history, workspace, auditorProvider, auditorModel, onEvent } = opts;
 
   const model = getAiModel(auditorProvider, auditorModel);
+
+  // In-memory artifact store for this agent run
+  const artifactMap = new Map<string, Artifact>();
+
+  // Create tools with workspace context
+  const tools = createAgentTools({
+    workspace: artifactMap,
+    onEvent,
+  });
 
   // Determine current stage context
   const stage = stageForPhase(workspace.phase);
@@ -56,7 +65,7 @@ export async function runLlmAgent(opts: LlmAgentOptions): Promise<string> {
       model,
       system: systemPrompt(workspace),
       messages,
-      tools: agentTools,
+      tools,
       stopWhen: stepCountIs(5),
       onStepFinish({ text, toolCalls }) {
         if (toolCalls && toolCalls.length > 0) {

@@ -16,6 +16,7 @@ import type {
   ToolCall,
 } from "@/lib/types";
 import { generateId } from "@/lib/utils";
+import { toast } from "@/components/ui/toast";
 
 interface AgentStore {
   // Chat state
@@ -195,7 +196,7 @@ export const useAgentStore = create<AgentStore>()(
             store.setLifecycle("awaiting_approval");
             break;
           case "notice":
-            // Notices are shown as toasts by the UI layer
+            toast(event.notice.level, event.notice.message);
             break;
           case "done":
             store.finalizeStream();

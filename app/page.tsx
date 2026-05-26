@@ -15,6 +15,7 @@ import { HydrationGuard } from "@/components/ui/hydration-guard";
 import { DomainDetailPanel } from "@/components/domain/domain-detail-panel";
 import { useUIStore } from "@/lib/stores/ui-store";
 import { useProjectStore } from "@/lib/stores/project-store";
+import { initAgentDomainBridge } from "@/lib/stores/agent-domain-bridge";
 import type { DomainId } from "@/lib/types";
 
 export default function WorkspacePage() {
@@ -25,6 +26,11 @@ export default function WorkspacePage() {
   const detailPanelOpen = useUIStore((s) => s.detailPanelOpen);
   const settingsOpen = useUIStore((s) => s.settingsOpen);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
+
+  // Initialize agent → domain store bridge
+  useEffect(() => {
+    initAgentDomainBridge();
+  }, []);
 
   // Keyboard shortcuts
   useEffect(() => {
