@@ -199,12 +199,11 @@ export function AgentChat() {
   };
 
   const handleRetry = () => {
-    // Re-send the last user message
     const lastUserMsg = [...messages]
       .reverse()
       .find((m) => m.role === "user");
     if (lastUserMsg) {
-      sendMessage(lastUserMsg.content);
+      sendMessage(lastUserMsg.content, { skipAddUser: true });
     }
   };
 

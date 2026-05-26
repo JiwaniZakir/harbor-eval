@@ -26,6 +26,8 @@ export default function WorkspacePage() {
   const detailPanelOpen = useUIStore((s) => s.detailPanelOpen);
   const settingsOpen = useUIStore((s) => s.settingsOpen);
   const setSettingsOpen = useUIStore((s) => s.setSettingsOpen);
+  const companionOpen = useUIStore((s) => s.companionOpen);
+  const setCompanionOpen = useUIStore((s) => s.setCompanionOpen);
 
   // Initialize agent → domain store bridge
   useEffect(() => {
@@ -115,6 +117,23 @@ export default function WorkspacePage() {
                     </div>
                   </div>
                 </div>
+              )}
+
+              {/* Mobile sidebar overlay */}
+              {project && companionOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 z-[var(--z-sidebar)] bg-black/30 md:hidden"
+                    onClick={() => setCompanionOpen(false)}
+                  />
+                  <div className="fixed inset-y-0 right-0 z-[calc(var(--z-sidebar)+1)] flex w-[min(90vw,380px)] flex-col md:hidden">
+                    <div className="flex h-full flex-col overflow-hidden bg-[var(--bg-sidebar)] shadow-[var(--shadow-lg)]">
+                      <div className="flex-1 overflow-y-auto bg-[var(--bg-sidebar-inner)] m-1.5 p-3 rounded-[10px]">
+                        {detailPanelOpen && focusedDomainId ? <DomainDetailPanel /> : <SidebarContent />}
+                      </div>
+                    </div>
+                  </div>
+                </>
               )}
             </div>
 

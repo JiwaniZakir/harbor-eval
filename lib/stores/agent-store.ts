@@ -57,7 +57,7 @@ interface AgentStore {
   reset: () => void;
 
   // Send message (calls API)
-  sendMessage: (content: string) => Promise<void>;
+  sendMessage: (content: string, opts?: { skipAddUser?: boolean }) => Promise<void>;
 }
 
 export const useAgentStore = create<AgentStore>()(
@@ -238,9 +238,11 @@ export const useAgentStore = create<AgentStore>()(
           approvalGate: null,
         }),
 
-      sendMessage: async (content) => {
+      sendMessage: async (content, opts) => {
         const store = get();
-        store.addUserMessage(content);
+        if (!opts?.skipAddUser) {
+          store.addUserMessage(content);
+        }
         store.setStreaming(true);
         store.setLifecycle("initializing");
 

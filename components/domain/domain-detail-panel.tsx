@@ -9,6 +9,7 @@ import { useUIStore } from "@/lib/stores/ui-store";
 import { useDomainStore } from "@/lib/stores/domain-store";
 import { DOMAINS } from "@/lib/domain/domains";
 import type { Milestone, MilestoneStatus } from "@/lib/types";
+import { DomainDetailSkeleton } from "@/components/ui/skeleton";
 
 function MilestoneStatusIcon({ status }: { status: MilestoneStatus }) {
   switch (status) {
@@ -129,10 +130,10 @@ export function DomainDetailPanel() {
   const domainStates = useDomainStore((s) => s.domainStates);
   const getMilestonesForDomain = useDomainStore((s) => s.getMilestonesForDomain);
 
-  if (!focusedDomainId) return null;
+  if (!focusedDomainId) return <DomainDetailSkeleton />;
 
   const domain = DOMAINS.find((d) => d.id === focusedDomainId);
-  if (!domain) return null;
+  if (!domain) return <DomainDetailSkeleton />;
 
   const state = domainStates[focusedDomainId];
   const milestones = getMilestonesForDomain(focusedDomainId);

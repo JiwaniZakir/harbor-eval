@@ -47,17 +47,43 @@ export async function POST(req: NextRequest) {
     }
 
     // Apply client-provided API keys to process.env if not already set.
-    // These are only available for the duration of this request.
     if (apiKeys) {
-      if (apiKeys.openai && !process.env.OPENAI_API_KEY) {
-        process.env.OPENAI_API_KEY = apiKeys.openai;
-      }
-      if (apiKeys.anthropic && !process.env.ANTHROPIC_API_KEY) {
+      if (apiKeys.openai) process.env.OPENAI_API_KEY = apiKeys.openai;
+      if (apiKeys.anthropic)
         process.env.ANTHROPIC_API_KEY = apiKeys.anthropic;
-      }
-      if (apiKeys.google && !process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+      if (apiKeys.google)
         process.env.GOOGLE_GENERATIVE_AI_API_KEY = apiKeys.google;
-      }
+    }
+
+    // Verify the auditor provider has an API key configured
+    const keyMap: Record<string, string | undefined> = {
+      openai: process.env.OPENAI_API_KEY,
+      anthropic: process.env.ANTHROPIC_API_KEY,
+      google: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
+    };
+
+    if (!keyMap[auditorProvider]) {
+      const encoder = new TextEncoder();
+      const stream = new ReadableStream({
+        start(controller) {
+          const event: AgentEvent = {
+            type: "error",
+            message: `No API key configured for ${auditorProvider}. Open Settings (gear icon) and add your ${auditorProvider} API key, or switch to a provider with a configured key.`,
+          };
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify(event)}\n\n`),
+          );
+          controller.enqueue(encoder.encode(`data: [DONE]\n\n`));
+          controller.close();
+        },
+      });
+      return new Response(stream, {
+        headers: {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache",
+          Connection: "keep-alive",
+        },
+      });
     }
 
     // Use provided workspace or create a fresh one

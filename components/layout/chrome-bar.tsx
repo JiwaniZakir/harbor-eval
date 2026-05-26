@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Plus, Bell, Settings, Compass } from "lucide-react";
+import { Search, Plus, Bell, Settings, Compass, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -16,11 +16,30 @@ export function ChromeBar() {
   const notificationCount = useUIStore((s) => s.notificationCount);
   const currentPhase = useAgentStore((s) => s.currentPhase);
   const toggleSettings = useUIStore((s) => s.toggleSettings);
+  const toggleCompanion = useUIStore((s) => s.toggleCompanion);
 
   return (
     <nav className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-chrome)] flex items-center justify-between px-4 py-3" aria-label="Main navigation">
       {/* Left group */}
       <div className="pointer-events-auto flex items-center gap-1.5">
+        {/* Mobile hamburger for sidebar */}
+        <TooltipProvider delayDuration={300}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="glass"
+                size="icon-sm"
+                className="rounded-full md:hidden"
+                onClick={toggleCompanion}
+                aria-label="Toggle sidebar"
+              >
+                <Menu size={14} />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Toggle sidebar</TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
