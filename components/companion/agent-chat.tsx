@@ -15,6 +15,8 @@ import {
   XCircle,
   Clock,
   Loader2,
+  AlertTriangle,
+  RotateCcw,
 } from "lucide-react";
 import type { ChatMessage, ToolCall, PlanStep } from "@/lib/types";
 import { formatRelativeTime } from "@/lib/utils";
@@ -169,7 +171,15 @@ function StreamingBubble({ text }: { text: string }) {
 }
 
 export function AgentChat() {
-  const { messages, isStreaming, currentStreamText, currentPlan, sendMessage } = useAgentStore();
+  const {
+    messages,
+    isStreaming,
+    currentStreamText,
+    currentPlan,
+    lifecycle,
+    sendMessage,
+    reset,
+  } = useAgentStore();
 
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -188,7 +198,23 @@ export function AgentChat() {
     sendMessage(msg);
   };
 
+  const handleRetry = () => {
+    // Re-send the last user message
+    const lastUserMsg = [...messages]
+      .reverse()
+      .find((m) => m.role === "user");
+    if (lastUserMsg) {
+      sendMessage(lastUserMsg.content);
+    }
+  };
+
   const hasMessages = messages.length > 0;
+  const isError = lifecycle === "error";
+  const lastMessage = messages[messages.length - 1];
+  const errorMessage =
+    isError && lastMessage?.role === "assistant"
+      ? lastMessage.content
+      : null;
 
   return (
     <div className="flex h-full flex-col">
@@ -227,6 +253,45 @@ export function AgentChat() {
             <div className="flex items-center gap-2 rounded-[var(--radius-lg)] border border-[var(--border-subtle)] bg-[var(--bg-card)] px-3 py-2 shadow-[var(--shadow-sm)]">
               <Spinner size={14} />
               <span className="text-xs text-[var(--text-muted)]">Thinking...</span>
+            </div>
+          </div>
+        )}
+
+        {/* Error state */}
+        {isError && (
+          <div className="flex flex-col gap-2 rounded-[var(--radius-md)] border border-[var(--status-error)]/20 bg-[var(--status-error)]/5 p-3">
+            <div className="flex items-center gap-2">
+              <AlertTriangle
+                size={14}
+                className="text-[var(--status-error)]"
+              />
+              <span className="text-xs font-medium text-[var(--status-error)]">
+                Something went wrong
+              </span>
+            </div>
+            {errorMessage && (
+              <p className="text-xs text-[var(--text-muted)]">
+                {errorMessage}
+              </p>
+            )}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-6 text-[10px]"
+                onClick={handleRetry}
+              >
+                <RotateCcw size={10} />
+                Retry
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 text-[10px]"
+                onClick={reset}
+              >
+                Clear
+              </Button>
             </div>
           </div>
         )}
