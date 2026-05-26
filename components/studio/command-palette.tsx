@@ -4,8 +4,20 @@ import { useState, useCallback } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/stores/ui-store";
+import { useAgentStore } from "@/lib/stores/agent-store";
 import { DOMAINS } from "@/lib/domain/domains";
-import { Search, Settings, Plus, Bot, Home } from "lucide-react";
+import {
+  Search,
+  Settings,
+  Plus,
+  Bot,
+  Home,
+  Layers,
+  ClipboardList,
+  Library,
+  Download,
+  RotateCcw,
+} from "lucide-react";
 import type { DomainId } from "@/lib/types";
 
 interface CommandItem {
@@ -24,6 +36,8 @@ export function CommandPalette() {
   const setFocusedDomain = useUIStore((s) => s.setFocusedDomain);
   const openDetailPanel = useUIStore((s) => s.openDetailPanel);
   const setSetupWizardOpen = useUIStore((s) => s.setSetupWizardOpen);
+  const toggleSettings = useUIStore((s) => s.toggleSettings);
+  const resetAgent = useAgentStore((s) => s.reset);
 
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -42,9 +56,43 @@ export function CommandPalette() {
     {
       id: "agent",
       label: "Open Agent Chat",
+      description: "Chat with the evaluation agent",
       icon: <Bot size={16} />,
       action: () => {
         setSidebarTab("agent");
+        setOpen(false);
+      },
+      category: "Navigation",
+    },
+    {
+      id: "domains",
+      label: "View Domains",
+      description: "Browse all evaluation domains",
+      icon: <Layers size={16} />,
+      action: () => {
+        setSidebarTab("domains");
+        setOpen(false);
+      },
+      category: "Navigation",
+    },
+    {
+      id: "tasks",
+      label: "View Tasks",
+      description: "Browse all milestones",
+      icon: <ClipboardList size={16} />,
+      action: () => {
+        setSidebarTab("tasks");
+        setOpen(false);
+      },
+      category: "Navigation",
+    },
+    {
+      id: "library",
+      label: "Artifact Library",
+      description: "View generated artifacts and export",
+      icon: <Library size={16} />,
+      action: () => {
+        setSidebarTab("library");
         setOpen(false);
       },
       category: "Navigation",
@@ -60,25 +108,59 @@ export function CommandPalette() {
       },
       category: "Actions",
     },
+    {
+      id: "settings",
+      label: "Settings",
+      description: "API keys and model configuration",
+      icon: <Settings size={16} />,
+      action: () => {
+        toggleSettings();
+        setOpen(false);
+      },
+      category: "Actions",
+    },
+    {
+      id: "export",
+      label: "Export Task Pack",
+      description: "Download Harbor task pack as JSON",
+      icon: <Download size={16} />,
+      action: () => {
+        setSidebarTab("library");
+        setOpen(false);
+      },
+      category: "Actions",
+    },
+    {
+      id: "reset-agent",
+      label: "Reset Agent",
+      description: "Clear agent chat and state",
+      icon: <RotateCcw size={16} />,
+      action: () => {
+        resetAgent();
+        setOpen(false);
+      },
+      category: "Actions",
+    },
     ...DOMAINS.map((domain) => ({
       id: `domain-${domain.id}`,
       label: domain.label,
       description: domain.description,
-      icon: <div className="h-3 w-3 rounded-full" style={{ backgroundColor: domain.accent }} />,
+      icon: (
+        <div
+          className="h-3 w-3 rounded-full"
+          style={{ backgroundColor: domain.accent }}
+        />
+      ),
       action: () => {
         setFocusedDomain(domain.id as DomainId);
-        openDetailPanel({ kind: "domain" as const, domainId: domain.id as DomainId });
+        openDetailPanel({
+          kind: "domain" as const,
+          domainId: domain.id as DomainId,
+        });
         setOpen(false);
       },
       category: "Domains",
     })),
-    {
-      id: "settings",
-      label: "Settings",
-      icon: <Settings size={16} />,
-      action: () => setOpen(false),
-      category: "Actions",
-    },
   ];
 
   const filtered = query.trim()
@@ -125,12 +207,25 @@ export function CommandPalette() {
   return (
     <Dialog.Root open={isOpen} onOpenChange={setOpen}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-[var(--z-command)] bg-black/40 animate-fade-blur" />
-        <Dialog.Content className="fixed left-1/2 top-[20%] z-[var(--z-command)] w-full max-w-[520px] -translate-x-1/2 animate-slide-down">
+        <Dialog.Overlay className="fixed inset-0 z-[var(--z-command)] animate-fade-blur bg-black/40" />
+        <Dialog.Content
+          className="fixed left-1/2 top-[20%] z-[var(--z-command)] w-full max-w-[520px] -translate-x-1/2 animate-slide-down"
+          aria-label="Command palette"
+        >
+          <Dialog.Title className="sr-only">
+            Command Palette
+          </Dialog.Title>
+          <Dialog.Description className="sr-only">
+            Search and execute commands, navigate to domains, or open
+            settings.
+          </Dialog.Description>
           <div className="overflow-hidden rounded-[var(--radius-xl)] border border-[var(--border-subtle)] bg-[var(--bg-card)] shadow-[var(--shadow-xl)]">
             {/* Search input */}
             <div className="flex items-center gap-3 border-b border-[var(--border-subtle)] px-4 py-3">
-              <Search size={16} className="shrink-0 text-[var(--foreground-40)]" />
+              <Search
+                size={16}
+                className="shrink-0 text-[var(--foreground-40)]"
+              />
               <input
                 value={query}
                 onChange={(e) => handleQueryChange(e.target.value)}
@@ -138,6 +233,7 @@ export function CommandPalette() {
                 placeholder="Search commands, domains..."
                 className="flex-1 bg-transparent text-sm text-[var(--foreground)] outline-none placeholder:text-[var(--text-muted)]"
                 autoFocus
+                aria-label="Search commands"
               />
               <kbd className="rounded-[4px] border border-[var(--border)] bg-[var(--bg-raised)] px-1.5 py-0.5 text-[10px] text-[var(--text-muted)]">
                 ESC
@@ -145,9 +241,13 @@ export function CommandPalette() {
             </div>
 
             {/* Results */}
-            <div className="max-h-[320px] overflow-y-auto p-1.5">
+            <div
+              className="max-h-[320px] overflow-y-auto p-1.5"
+              role="listbox"
+              aria-label="Command results"
+            >
               {Object.entries(grouped).map(([category, items]) => (
-                <div key={category}>
+                <div key={category} role="group" aria-label={category}>
                   <div className="px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--text-muted)]">
                     {category}
                   </div>
@@ -159,6 +259,8 @@ export function CommandPalette() {
                         key={item.id}
                         onClick={item.action}
                         onMouseEnter={() => setSelectedIndex(idx)}
+                        role="option"
+                        aria-selected={idx === selectedIndex}
                         className={cn(
                           "flex w-full items-center gap-3 rounded-[var(--radius-md)] px-3 py-2 text-left transition-colors",
                           idx === selectedIndex
@@ -166,9 +268,13 @@ export function CommandPalette() {
                             : "hover:bg-[var(--foreground-5)]",
                         )}
                       >
-                        <span className="shrink-0 text-[var(--foreground-40)]">{item.icon}</span>
+                        <span className="shrink-0 text-[var(--foreground-40)]">
+                          {item.icon}
+                        </span>
                         <div className="min-w-0 flex-1">
-                          <div className="text-sm text-[var(--foreground)]">{item.label}</div>
+                          <div className="text-sm text-[var(--foreground)]">
+                            {item.label}
+                          </div>
                           {item.description && (
                             <div className="truncate text-xs text-[var(--text-muted)]">
                               {item.description}

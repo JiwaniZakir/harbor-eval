@@ -18,13 +18,13 @@ export function ChromeBar() {
   const toggleSettings = useUIStore((s) => s.toggleSettings);
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-chrome)] flex items-center justify-between px-4 py-3">
+    <nav className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-chrome)] flex items-center justify-between px-4 py-3" aria-label="Main navigation">
       {/* Left group */}
       <div className="pointer-events-auto flex items-center gap-1.5">
         <TooltipProvider delayDuration={300}>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="glass" size="icon-sm" className="rounded-full text-xs font-semibold">
+              <Button variant="glass" size="icon-sm" className="rounded-full text-xs font-semibold" aria-label="Harbor Eval home">
                 <Compass size={14} />
               </Button>
             </TooltipTrigger>
@@ -59,6 +59,7 @@ export function ChromeBar() {
                 size="icon-sm"
                 className="rounded-full"
                 onClick={toggleCommandPalette}
+                aria-label="Search commands"
               >
                 <Search size={14} />
               </Button>
@@ -73,6 +74,7 @@ export function ChromeBar() {
                 size="icon-sm"
                 className="rounded-full"
                 onClick={() => setSetupWizardOpen(true)}
+                aria-label="New campaign"
               >
                 <Plus size={14} />
               </Button>
@@ -82,7 +84,7 @@ export function ChromeBar() {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="glass" size="icon-sm" className="relative rounded-full">
+              <Button variant="glass" size="icon-sm" className="relative rounded-full" aria-label="Notifications">
                 <Bell size={14} />
                 {notificationCount > 0 && (
                   <Badge
@@ -104,6 +106,7 @@ export function ChromeBar() {
                 size="icon-sm"
                 className="rounded-full"
                 onClick={toggleSettings}
+                aria-label="Settings"
               >
                 <Settings size={14} />
               </Button>
@@ -112,6 +115,6 @@ export function ChromeBar() {
           </Tooltip>
         </TooltipProvider>
       </div>
-    </div>
+    </nav>
   );
 }

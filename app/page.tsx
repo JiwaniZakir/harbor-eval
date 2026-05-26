@@ -105,9 +105,9 @@ export default function WorkspacePage() {
               {/* Canvas (full viewport) */}
               <div className="relative flex-1">{project ? <CanvasShell /> : <EmptyCanvas />}</div>
 
-              {/* Floating sidebar */}
+              {/* Floating sidebar -- hidden on mobile, visible on md+ */}
               {project && (
-                <div className="z-[var(--z-sidebar)] flex h-full w-[var(--sidebar-width)] shrink-0 flex-col my-2 mr-2">
+                <div className="z-[var(--z-sidebar)] hidden md:flex h-full w-[var(--sidebar-width)] shrink-0 flex-col my-2 mr-2">
                   <div className="flex h-full flex-col overflow-hidden rounded-[var(--radius-lg)] bg-[var(--bg-sidebar)] shadow-[var(--shadow-md)]">
                     {/* Inner content */}
                     <div className="flex-1 overflow-y-auto rounded-[10px] bg-[var(--bg-sidebar-inner)] m-1.5 p-3">
