@@ -17,6 +17,8 @@ import type {
 } from "@/lib/types";
 import { generateId } from "@/lib/utils";
 import { toast } from "@/components/ui/toast";
+import { getStoredApiKeys } from "@/components/studio/settings-panel";
+import { useProjectStore } from "./project-store";
 
 interface AgentStore {
   // Chat state
@@ -242,6 +244,19 @@ export const useAgentStore = create<AgentStore>()(
         store.setStreaming(true);
         store.setLifecycle("initializing");
 
+        // Read model config from project store and API keys from session
+        const project = useProjectStore.getState().project;
+        const apiKeys = getStoredApiKeys();
+
+        // Infer auditor provider from model slug
+        const auditorSlug =
+          project?.auditorModel || "claude-sonnet-4-20250514";
+        const auditorProvider = auditorSlug.includes("claude")
+          ? "anthropic"
+          : auditorSlug.includes("gemini")
+            ? "google"
+            : "openai";
+
         try {
           const res = await fetch("/api/agent", {
             method: "POST",
@@ -249,6 +264,11 @@ export const useAgentStore = create<AgentStore>()(
             body: JSON.stringify({
               message: content,
               history: store.messages,
+              targetProvider: project?.targetModel?.provider || "openai",
+              targetModel: project?.targetModel?.model || "gpt-4o",
+              auditorProvider,
+              auditorModel: auditorSlug,
+              apiKeys,
             }),
           });
 

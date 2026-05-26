@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Key, Cpu, Save } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,22 @@ import { toast } from "@/components/ui/toast";
 import { cn } from "@/lib/utils";
 import { modelRegistry, type LlmProvider } from "@/lib/ai/providers";
 import { useProjectStore } from "@/lib/stores/project-store";
+
+const STORAGE_KEY = "harbor-eval-api-keys";
+
+/** Read API keys from sessionStorage. */
+export function getStoredApiKeys(): Record<LlmProvider, string> {
+  if (typeof window === "undefined") {
+    return { openai: "", anthropic: "", google: "" };
+  }
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {
+    // ignore parse errors
+  }
+  return { openai: "", anthropic: "", google: "" };
+}
 
 interface SettingsPanelProps {
   open: boolean;
@@ -26,6 +42,11 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
     google: "",
   });
 
+  // Load saved keys on mount
+  useEffect(() => {
+    setKeys(getStoredApiKeys());
+  }, []);
+
   if (!open) return null;
 
   const tabs = [
@@ -34,8 +55,7 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   ];
 
   const handleSaveKeys = () => {
-    // In production, these would be stored securely server-side
-    // For now, just show a toast
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(keys));
     toast("success", "API keys saved for this session.");
   };
 
@@ -47,13 +67,18 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
   return (
     <div className="fixed inset-0 z-[var(--z-dialog,100)]">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-[2px]" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/20 backdrop-blur-[2px]"
+        onClick={onClose}
+      />
 
       {/* Panel */}
-      <div className="absolute right-0 top-0 bottom-0 w-full max-w-md animate-in slide-in-from-right border-l border-[var(--border-subtle)] bg-[var(--bg-app)] shadow-[var(--shadow-lg)]">
+      <div className="absolute bottom-0 right-0 top-0 w-full max-w-md animate-in slide-in-from-right border-l border-[var(--border-subtle)] bg-[var(--bg-app)] shadow-[var(--shadow-lg)]">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-4">
-          <h2 className="text-base font-semibold text-[var(--foreground)]">Settings</h2>
+          <h2 className="text-base font-semibold text-[var(--foreground)]">
+            Settings
+          </h2>
           <Button variant="ghost" size="icon-sm" onClick={onClose}>
             <X size={16} />
           </Button>
@@ -83,31 +108,48 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           {activeTab === "keys" && (
             <div className="flex flex-col gap-5">
               <p className="text-xs text-[var(--text-muted)]">
-                API keys are stored in your browser and sent directly to providers. They are never
-                stored on our servers.
+                API keys are stored in your browser session and sent directly
+                to providers. They are never stored on our servers.
               </p>
 
-              {(["openai", "anthropic", "google"] as const).map((provider) => (
-                <div key={provider} className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium capitalize text-[var(--text-secondary)]">
-                    {provider} API Key
-                  </label>
-                  <Input
-                    type="password"
-                    placeholder={
-                      provider === "openai"
-                        ? "sk-..."
-                        : provider === "anthropic"
-                          ? "sk-ant-..."
-                          : "AI..."
-                    }
-                    value={keys[provider]}
-                    onChange={(e) => setKeys((k) => ({ ...k, [provider]: e.target.value }))}
-                  />
-                </div>
-              ))}
+              {(["openai", "anthropic", "google"] as const).map(
+                (provider) => (
+                  <div key={provider} className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium capitalize text-[var(--text-secondary)]">
+                      {provider} API Key
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder={
+                        provider === "openai"
+                          ? "sk-..."
+                          : provider === "anthropic"
+                            ? "sk-ant-..."
+                            : "AI..."
+                      }
+                      value={keys[provider]}
+                      onChange={(e) =>
+                        setKeys((k) => ({
+                          ...k,
+                          [provider]: e.target.value,
+                        }))
+                      }
+                    />
+                    {keys[provider] && (
+                      <span className="text-[10px] text-[var(--status-success)]">
+                        Key configured
+                      </span>
+                    )}
+                  </div>
+                ),
+              )}
 
-              <Button variant="primary" size="sm" className="self-end" onClick={handleSaveKeys}>
+              <Button
+                variant="primary"
+                size="sm"
+                className="self-end"
+                onClick={handleSaveKeys}
+              >
                 <Save size={14} />
                 Save Keys
               </Button>
@@ -117,15 +159,19 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
           {activeTab === "model" && (
             <div className="flex flex-col gap-4">
               <p className="text-xs text-[var(--text-muted)]">
-                Select the target model to evaluate. The auditor model is automatically chosen as a
-                cross-provider alternative.
+                Select the target model to evaluate. The auditor model is
+                automatically chosen as a cross-provider alternative.
               </p>
 
               {project && (
                 <div className="rounded-[var(--radius-md)] border border-[var(--border-subtle)] bg-[var(--bg-card)] p-3">
-                  <span className="text-xs text-[var(--text-muted)]">Current target:</span>
+                  <span className="text-xs text-[var(--text-muted)]">
+                    Current target:
+                  </span>
                   <div className="mt-1 flex items-center gap-2">
-                    <Badge variant="primary">{project.targetModel.provider}</Badge>
+                    <Badge variant="primary">
+                      {project.targetModel.provider}
+                    </Badge>
                     <span className="text-sm font-medium text-[var(--foreground)]">
                       {project.targetModel.model}
                     </span>
@@ -134,40 +180,50 @@ export function SettingsPanel({ open, onClose }: SettingsPanelProps) {
               )}
 
               <div className="flex flex-col gap-2">
-                {(["openai", "anthropic", "google"] as const).map((provider) => {
-                  const models = modelRegistry.filter((m) => m.provider === provider);
-                  return (
-                    <div key={provider}>
-                      <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
-                        {provider}
-                      </h4>
-                      <div className="flex flex-col gap-1">
-                        {models.map((m) => {
-                          const isActive =
-                            project?.targetModel.provider === m.provider &&
-                            project?.targetModel.model === m.modelSlug;
-                          return (
-                            <button
-                              key={m.modelSlug}
-                              onClick={() => handleModelSelect(m.provider, m.modelSlug)}
-                              className={cn(
-                                "flex items-center gap-2 rounded-[var(--radius-md)] px-3 py-2 text-left text-sm transition-colors",
-                                isActive
-                                  ? "bg-[var(--accent-muted)] text-[var(--brand-primary)] font-medium"
-                                  : "text-[var(--foreground)] hover:bg-[var(--foreground-5)]",
-                              )}
-                            >
-                              <span className="flex-1">{m.label}</span>
-                              <span className="font-mono text-[10px] text-[var(--text-muted)]">
-                                {m.modelSlug}
-                              </span>
-                            </button>
-                          );
-                        })}
+                {(["openai", "anthropic", "google"] as const).map(
+                  (provider) => {
+                    const models = modelRegistry.filter(
+                      (m) => m.provider === provider,
+                    );
+                    return (
+                      <div key={provider}>
+                        <h4 className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-[var(--text-muted)]">
+                          {provider}
+                        </h4>
+                        <div className="flex flex-col gap-1">
+                          {models.map((m) => {
+                            const isActive =
+                              project?.targetModel.provider ===
+                                m.provider &&
+                              project?.targetModel.model === m.modelSlug;
+                            return (
+                              <button
+                                key={m.modelSlug}
+                                onClick={() =>
+                                  handleModelSelect(
+                                    m.provider,
+                                    m.modelSlug,
+                                  )
+                                }
+                                className={cn(
+                                  "flex items-center gap-2 rounded-[var(--radius-md)] px-3 py-2 text-left text-sm transition-colors",
+                                  isActive
+                                    ? "bg-[var(--accent-muted)] font-medium text-[var(--brand-primary)]"
+                                    : "text-[var(--foreground)] hover:bg-[var(--foreground-5)]",
+                                )}
+                              >
+                                <span className="flex-1">{m.label}</span>
+                                <span className="font-mono text-[10px] text-[var(--text-muted)]">
+                                  {m.modelSlug}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  },
+                )}
               </div>
             </div>
           )}
